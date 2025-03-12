@@ -3,8 +3,12 @@ import 'package:jebek_app/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController(
+    /*  text: 'user2@example.com', */
+  );
+  final TextEditingController passwordController = TextEditingController(
+    /*  text: 'password', */
+  );
 
   // Método para iniciar sesión
   void _login(BuildContext context) async {
@@ -21,7 +25,7 @@ class LoginScreen extends StatelessWidget {
       await prefs.setString('access_token', response['access_token']);
 
       // Navegar a la pantalla de lista de productos
-      Navigator.pushReplacementNamed(context, '/product_list');
+      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       // Mostrar un mensaje de error si falla el inicio de sesión
       ScaffoldMessenger.of(
