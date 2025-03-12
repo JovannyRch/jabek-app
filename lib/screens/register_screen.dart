@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jebek_app/components/app_logo.dart';
 import '../services/api_service.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -46,20 +47,23 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Registro')),
+      /*   appBar: AppBar(title: Text('Registro')), */
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             children: [
               SizedBox(height: 16.0),
-              /*   TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: 'Nombre',
-                  border: OutlineInputBorder(),
+              AppLogo(),
+              Text(
+                'Registro de usuario',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: ThemeData().primaryColor,
                 ),
-              ), */
+              ),
+              SizedBox(height: 8.0),
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jebek_app/components/app_logo.dart';
 import 'package:jebek_app/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,12 +38,23 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Iniciar Sesión')),
+      /*       appBar: AppBar(title: Text('Iniciar Sesión')), */
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             // Campo de email
+            SizedBox(height: 16.0),
+            AppLogo(),
+            Text(
+              'Iniciar Sesión',
+              style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: ThemeData().primaryColor,
+              ),
+            ),
+            SizedBox(height: 8.0),
             TextField(
               controller: emailController,
               decoration: InputDecoration(
