@@ -48,63 +48,65 @@ class RegisterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       /*   appBar: AppBar(title: Text('Registro')), */
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 16.0),
-              AppLogo(),
-              Text(
-                'Registro de usuario',
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: ThemeData().primaryColor,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: 16.0),
+                AppLogo(),
+                Text(
+                  'Registro de usuario',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                    color: ThemeData().primaryColor,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8.0),
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
+                SizedBox(height: 8.0),
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
                 ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              SizedBox(height: 16.0),
-              TextField(
-                controller: passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Contraseña',
-                  border: OutlineInputBorder(),
+                SizedBox(height: 16.0),
+                TextField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Contraseña',
+                    border: OutlineInputBorder(),
+                  ),
+                  obscureText: true,
                 ),
-                obscureText: true,
-              ),
-              SizedBox(height: 16.0),
-              TextField(
-                controller: passwordConfirmationController,
-                decoration: InputDecoration(
-                  labelText: 'Confirmar Contraseña',
-                  border: OutlineInputBorder(),
+                SizedBox(height: 16.0),
+                TextField(
+                  controller: passwordConfirmationController,
+                  decoration: InputDecoration(
+                    labelText: 'Confirmar Contraseña',
+                    border: OutlineInputBorder(),
+                  ),
+                  obscureText: true,
                 ),
-                obscureText: true,
-              ),
-              SizedBox(height: 24.0),
-              ElevatedButton(
-                onPressed: () => _register(context),
-                child: Text('Registrarse'),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50), // Botón ancho
+                SizedBox(height: 24.0),
+                ElevatedButton(
+                  onPressed: () => _register(context),
+                  child: Text('Registrarse'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50), // Botón ancho
+                  ),
                 ),
-              ),
-              SizedBox(height: 16.0),
-              TextButton(
-                onPressed:
-                    () => Navigator.pushReplacementNamed(context, '/login'),
-                child: Text('¿Ya tienes una cuenta? Inicia sesión'),
-              ),
-            ],
+                SizedBox(height: 16.0),
+                TextButton(
+                  onPressed:
+                      () => Navigator.pushReplacementNamed(context, '/login'),
+                  child: Text('¿Ya tienes una cuenta? Inicia sesión'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

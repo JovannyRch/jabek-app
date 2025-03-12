@@ -5,10 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController(
-    /*  text: 'user2@example.com', */
+    /* text: 'user2@example.com', */
   );
   final TextEditingController passwordController = TextEditingController(
-    /*  text: 'password', */
+    /*   text: 'password', */
   );
 
   // Método para iniciar sesión
@@ -18,8 +18,6 @@ class LoginScreen extends StatelessWidget {
         emailController.text,
         passwordController.text,
       );
-
-      print(response);
 
       // Guardar el token en SharedPreferences
       final prefs = await SharedPreferences.getInstance();
@@ -39,59 +37,63 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       /*       appBar: AppBar(title: Text('Iniciar Sesión')), */
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Campo de email
-            SizedBox(height: 16.0),
-            AppLogo(),
-            Text(
-              'Iniciar Sesión',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-                color: ThemeData().primaryColor,
-              ),
-            ),
-            SizedBox(height: 8.0),
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            SizedBox(height: 16.0),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                // Campo de email
+                SizedBox(height: 16.0),
+                AppLogo(),
+                Text(
+                  'Iniciar Sesión',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                    color: ThemeData().primaryColor,
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                SizedBox(height: 16.0),
 
-            // Campo de contraseña
-            TextField(
-              controller: passwordController,
-              decoration: InputDecoration(
-                labelText: 'Contraseña',
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true, // Oculta el texto de la contraseña
-            ),
-            SizedBox(height: 24.0),
+                // Campo de contraseña
+                TextField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Contraseña',
+                    border: OutlineInputBorder(),
+                  ),
+                  obscureText: true, // Oculta el texto de la contraseña
+                ),
+                SizedBox(height: 24.0),
 
-            // Botón de inicio de sesión
-            ElevatedButton(
-              onPressed: () => _login(context),
-              child: Text('Iniciar Sesión'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50), // Botón ancho
-              ),
-            ),
-            SizedBox(height: 16.0),
+                // Botón de inicio de sesión
+                ElevatedButton(
+                  onPressed: () => _login(context),
+                  child: Text('Iniciar Sesión'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50), // Botón ancho
+                  ),
+                ),
+                SizedBox(height: 16.0),
 
-            // Enlace a la pantalla de registro
-            TextButton(
-              onPressed: () => Navigator.pushNamed(context, '/register'),
-              child: Text('¿No tienes una cuenta? Regístrate'),
+                // Enlace a la pantalla de registro
+                TextButton(
+                  onPressed: () => Navigator.pushNamed(context, '/register'),
+                  child: Text('¿No tienes una cuenta? Regístrate'),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

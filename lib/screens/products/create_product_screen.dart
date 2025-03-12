@@ -54,52 +54,57 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Crear Producto')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'Nombre del Producto',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 16.0),
-            TextField(
-              controller: priceController,
-              decoration: InputDecoration(
-                labelText: 'Precio',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(height: 16.0),
-            TextField(
-              controller: stockController,
-              decoration: InputDecoration(
-                labelText: 'Total de unidades',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(height: 24.0),
-            if (isLoading)
-              CircularProgressIndicator()
-            else
-              ElevatedButton(
-                onPressed: () => _createProduct(context),
-                child: Text('Crear Producto'),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50), // Botón ancho
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Nombre del Producto',
+                  border: OutlineInputBorder(),
                 ),
               ),
-            if (errorMessage.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Text(errorMessage, style: TextStyle(color: Colors.red)),
+              SizedBox(height: 16.0),
+              TextField(
+                controller: priceController,
+                decoration: InputDecoration(
+                  labelText: 'Precio',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
               ),
-          ],
+              SizedBox(height: 16.0),
+              TextField(
+                controller: stockController,
+                decoration: InputDecoration(
+                  labelText: 'Total de unidades',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              SizedBox(height: 24.0),
+              if (isLoading)
+                CircularProgressIndicator()
+              else
+                ElevatedButton(
+                  onPressed: () => _createProduct(context),
+                  child: Text('Crear Producto'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50), // Botón ancho
+                  ),
+                ),
+              if (errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                    errorMessage,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

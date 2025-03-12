@@ -37,26 +37,28 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Lista de Productos')),
-      body:
-          isLoading
-              ? Center(child: CircularProgressIndicator())
-              : errorMessage.isNotEmpty
-              ? Center(child: Text(errorMessage))
-              : products.length == 0
-              ? _zeroState()
-              : ListView.builder(
-                itemCount: products.length,
+      body: SafeArea(
+        child:
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : errorMessage.isNotEmpty
+                ? Center(child: Text(errorMessage))
+                : products.length == 0
+                ? _zeroState()
+                : ListView.builder(
+                  itemCount: products.length,
 
-                itemBuilder: (context, index) {
-                  final product = products[index];
-                  return ListTile(
-                    title: Text('#${product['id']} - ${product['name']}'),
-                    subtitle: Text(
-                      'Precio: \$${product['price']} - Stock: ${product['stock']}',
-                    ),
-                  );
-                },
-              ),
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return ListTile(
+                      title: Text('#${product['id']} - ${product['name']}'),
+                      subtitle: Text(
+                        'Precio: \$${product['price']} - Stock: ${product['stock']}',
+                      ),
+                    );
+                  },
+                ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.pushNamed(context, '/create_product');
