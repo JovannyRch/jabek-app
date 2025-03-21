@@ -5,10 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController(
-    /* text: 'user2@example.com', */
+    text: 'user2@example.com',
   );
   final TextEditingController passwordController = TextEditingController(
-    /*   text: 'password', */
+    text: 'password',
   );
 
   // Método para iniciar sesión
@@ -79,9 +79,13 @@ class LoginScreen extends StatelessWidget {
                 // Botón de inicio de sesión
                 ElevatedButton(
                   onPressed: () => _login(context),
-                  child: Text('Iniciar Sesión'),
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50), // Botón ancho
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: ThemeData().primaryColor,
+                  ),
+                  child: Text(
+                    'Iniciar Sesión',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
                 SizedBox(height: 16.0),

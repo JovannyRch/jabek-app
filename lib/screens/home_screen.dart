@@ -1,85 +1,73 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:jebek_app/services/api_service.dart';
+import 'package:jebek_app/screens/dashboard_screen.dart';
+import 'package:jebek_app/screens/login_screen.dart';
+import 'package:jebek_app/screens/more_screen.dart';
+import 'package:jebek_app/screens/products/create_product_screen.dart';
+import 'package:jebek_app/screens/products/product_list_screen.dart';
+import 'package:jebek_app/screens/purchases_screen.dart';
+import 'package:jebek_app/screens/sales_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Inicio'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () async {
-              await ApiService.logout();
-              Navigator.pushReplacementNamed(context, '/login');
-            },
+      body: IndexedStack(index: _selectedIndex, children: _buildScreens()),
+      bottomNavigationBar: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Inicio',
+            backgroundColor: Theme.of(context).primaryColor,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory),
+            label: 'Productos',
+            backgroundColor: Theme.of(context).primaryColor,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.money_dollar),
+            label: 'Ventas',
+            backgroundColor: Theme.of(context).primaryColor,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Compras',
+            backgroundColor: Theme.of(context).primaryColor,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.more_horiz),
+            label: 'Más',
+            backgroundColor: Theme.of(context).primaryColor,
           ),
         ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildMenuCard(
-              context,
-              title: 'Productos',
-              icon: Icons.list,
-              onTap: () => Navigator.pushNamed(context, '/product_list'),
-            ),
-            _buildMenuCard(
-              context,
-              title: 'Registrar Producto',
-              icon: Icons.inventory,
-              onTap: () => Navigator.pushNamed(context, '/create_product'),
-            ),
-            SizedBox(height: 16.0),
-            // Tarjeta para registrar ventas
-            _buildMenuCard(
-              context,
-              title: 'Registrar Venta',
-              icon: Icons.shopping_cart,
-              onTap: () => Navigator.pushNamed(context, '/sales'),
-            ),
-            SizedBox(height: 16.0),
-            // Tarjeta para registrar compras
-            _buildMenuCard(
-              context,
-              title: 'Registrar Compra',
-              icon: Icons.shopping_bag,
-              onTap: () => Navigator.pushNamed(context, '/purchases'),
-            ),
-          ],
-        ),
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.white,
+        onTap: _onItemTapped,
       ),
     );
   }
 
-  // Método para construir una tarjeta de menú
-  Widget _buildMenuCard(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      elevation: 4.0,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Icon(icon, size: 40.0, color: Theme.of(context).primaryColor),
-              SizedBox(width: 16.0),
-              Text(
-                title,
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  List<Widget> _buildScreens() {
+    return [
+      DashboardScreen(),
+      ProductListScreen(),
+      SalesScreen(),
+      PurchasesScreen(),
+      MoreScreen(),
+    ];
   }
 }

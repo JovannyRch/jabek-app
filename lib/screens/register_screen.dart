@@ -94,9 +94,14 @@ class RegisterScreen extends StatelessWidget {
                 SizedBox(height: 24.0),
                 ElevatedButton(
                   onPressed: () => _register(context),
-                  child: Text('Registrarse'),
+                  child: Text(
+                    'Registrarse',
+                    style: TextStyle(color: Colors.white),
+                  ),
+
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50), // Botón ancho
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: ThemeData().primaryColor,
                   ),
                 ),
                 SizedBox(height: 16.0),

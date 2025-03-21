@@ -1,21 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jebek_app/models/product.dart';
+import 'package:jebek_app/services/share_preferences.dart';
 
 class ApiService {
   static const String baseUrl = 'https://jebek-fc1af0e483ef.herokuapp.com/api';
-
-  static Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('access_token');
-
-    return token;
-  }
-
-  static Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('access_token');
-  }
 
   // Método para registrar un usuario
   static Future<Map<String, dynamic>> register(
@@ -59,8 +48,8 @@ class ApiService {
   }
 
   // Método para obtener la lista de productos
-  static Future<List<dynamic>> getProducts() async {
-    final token = await getToken();
+  static Future<List<Product>> getProducts() async {
+    final token = await Preferences.getToken();
 
     if (token == null) {
       throw Exception('No se encontró el token de autenticación');
@@ -72,7 +61,10 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body)
+          .map<Product>((product) => Product.fromJson(product))
+          .toList()
+          .cast<Product>();
     } else {
       throw Exception('Error al obtener los productos');
     }
@@ -84,7 +76,7 @@ class ApiService {
     double price,
     int stock,
   ) async {
-    final token = await getToken();
+    final token = await Preferences.getToken();
     final response = await http.post(
       Uri.parse('$baseUrl/products'),
       headers: {

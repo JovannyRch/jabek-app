@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jebek_app/screens/dashboard_screen.dart';
 import 'package:jebek_app/screens/home_screen.dart';
 import 'package:jebek_app/screens/login_screen.dart';
 import 'package:jebek_app/screens/products/create_product_screen.dart';
@@ -6,6 +7,7 @@ import 'package:jebek_app/screens/products/product_list_screen.dart';
 import 'package:jebek_app/screens/purchases_screen.dart';
 import 'package:jebek_app/screens/register_screen.dart';
 import 'package:jebek_app/screens/sales_screen.dart';
+import 'package:jebek_app/screens/user/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const MyApp());
@@ -44,6 +46,8 @@ class MyApp extends StatelessWidget {
         '/create_product': (context) => CreateProductScreen(),
         '/sales': (context) => SalesScreen(),
         '/purchases': (context) => PurchasesScreen(),
+        '/profile': (context) => ProfileScreen(),
+        '/dashboard': (context) => DashboardScreen(),
       },
     );
   }
