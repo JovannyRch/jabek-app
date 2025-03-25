@@ -1,52 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:jebek_app/models/product.dart';
+import 'package:jebek_app/models/expense.dart';
 import 'package:jebek_app/services/api_service.dart';
+import 'package:jebek_app/utils/utils.dart';
 
-class ProductListScreen extends StatefulWidget {
+class PurchaseScreen extends StatefulWidget {
   @override
-  _ProductListScreenState createState() => _ProductListScreenState();
+  State<PurchaseScreen> createState() => _PurchaseScreenState();
 }
 
-class _ProductListScreenState extends State<ProductListScreen> {
+class _PurchaseScreenState extends State<PurchaseScreen> {
   final ScrollController _scrollController = ScrollController();
-  List<Product> products = [];
+
+  List<Expense> expenses = [];
   int currentPage = 1;
   bool isLoading = false;
   bool hasMore = true;
-  final String baseUrl = "${ApiService.baseUrl}/products";
 
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    fetchExpenses();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
           hasMore) {
-        fetchProducts();
+        fetchExpenses();
       }
     });
   }
 
-  Future<void> fetchProducts() async {
+  Future<void> fetchExpenses() async {
     if (isLoading) return;
 
     setState(() => isLoading = true);
 
     try {
-      final response = await ApiService.fetchPaginated<Product>(
-        "/products",
+      final response = await ApiService.fetchPaginated<Expense>(
+        "/expenses",
         currentPage,
-        Product.fromJson,
+        Expense.fromJson,
       );
 
       setState(() {
-        products.addAll(response.data);
+        expenses.addAll(response.data);
         currentPage++;
         hasMore = response.hasMore;
       });
     } catch (e) {
-      print("Error al cargar productos: $e");
+      print("Error al cargar gastos: $e");
     } finally {
       setState(() => isLoading = false);
     }
@@ -62,40 +63,45 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Productos", style: TextStyle(color: Colors.white)),
-        backgroundColor: ThemeData().primaryColor,
+        title: Text('Compras', style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: ListView.builder(
         controller: _scrollController,
-        itemCount: products.length + (isLoading ? 1 : 0),
+        itemCount: expenses.length + (isLoading ? 1 : 0),
         itemBuilder: (context, index) {
-          if (index == products.length) {
+          if (index == expenses.length) {
             return Center(child: CircularProgressIndicator());
           }
 
-          final product = products[index];
+          final expense = expenses[index];
           return ListTile(
-            title: Text(product.name),
-            subtitle: Text(
-              "Precio: \$${product.price} - Stock: ${product.stock}",
+            title: Text(expense.concept),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Monto: ${formatCurrency(expense.amount)}"),
+                Text("Fecha: ${expense.date}"),
+              ],
             ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        heroTag: 'add_product',
+        heroTag: 'create-expense',
         onPressed: () async {
           final response = await Navigator.pushNamed(
             context,
-            '/create_product',
+            '/create-purchase',
           );
+
           if (response == true) {
             setState(() {
-              products.clear();
+              expenses.clear();
               currentPage = 1;
               hasMore = true;
             });
-            fetchProducts();
+            fetchExpenses();
           }
         },
         child: Icon(Icons.add),

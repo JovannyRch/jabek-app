@@ -1,12 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jebek_app/screens/dashboard_screen.dart';
-import 'package:jebek_app/screens/login_screen.dart';
 import 'package:jebek_app/screens/more_screen.dart';
-import 'package:jebek_app/screens/products/create_product_screen.dart';
 import 'package:jebek_app/screens/products/product_list_screen.dart';
-import 'package:jebek_app/screens/purchases_screen.dart';
-import 'package:jebek_app/screens/sales_screen.dart';
+import 'package:jebek_app/screens/purchase/purchase_screen.dart';
+import 'package:jebek_app/screens/sales/sales_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -66,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
       DashboardScreen(),
       ProductListScreen(),
       SalesScreen(),
-      PurchasesScreen(),
+      PurchaseScreen(),
       MoreScreen(),
     ];
   }

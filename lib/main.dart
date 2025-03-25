@@ -4,9 +4,11 @@ import 'package:jebek_app/screens/home_screen.dart';
 import 'package:jebek_app/screens/login_screen.dart';
 import 'package:jebek_app/screens/products/create_product_screen.dart';
 import 'package:jebek_app/screens/products/product_list_screen.dart';
-import 'package:jebek_app/screens/purchases_screen.dart';
+import 'package:jebek_app/screens/purchase/purchase_form_screen.dart';
+import 'package:jebek_app/screens/purchase/purchase_screen.dart';
 import 'package:jebek_app/screens/register_screen.dart';
-import 'package:jebek_app/screens/sales_screen.dart';
+import 'package:jebek_app/screens/sales/sale_form_screen.dart';
+import 'package:jebek_app/screens/sales/sales_screen.dart';
 import 'package:jebek_app/screens/user/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -45,7 +47,9 @@ class MyApp extends StatelessWidget {
         '/register': (context) => RegisterScreen(),
         '/create_product': (context) => CreateProductScreen(),
         '/sales': (context) => SalesScreen(),
-        '/purchases': (context) => PurchasesScreen(),
+        '/create-sale': (context) => SaleFormScreen(),
+        '/purchases': (context) => PurchaseScreen(),
+        '/create-purchase': (context) => PurchaseFormScreen(),
         '/profile': (context) => ProfileScreen(),
         '/dashboard': (context) => DashboardScreen(),
       },

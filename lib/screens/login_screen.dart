@@ -5,10 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController(
-    text: 'user2@example.com',
+    /*   text: 'user2@example.com', */
   );
   final TextEditingController passwordController = TextEditingController(
-    text: 'password',
+    /*  text: 'password', */
   );
 
   // Método para iniciar sesión

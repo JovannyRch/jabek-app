@@ -1,101 +1,100 @@
 import 'package:flutter/material.dart';
-import 'package:jebek_app/models/product.dart';
+import 'package:jebek_app/models/sale.dart';
 import 'package:jebek_app/services/api_service.dart';
+import 'package:jebek_app/utils/utils.dart';
 
-class ProductListScreen extends StatefulWidget {
+class SalesScreen extends StatefulWidget {
   @override
-  _ProductListScreenState createState() => _ProductListScreenState();
+  State<SalesScreen> createState() => _SalesScreenState();
 }
 
-class _ProductListScreenState extends State<ProductListScreen> {
+class _SalesScreenState extends State<SalesScreen> {
   final ScrollController _scrollController = ScrollController();
-  List<Product> products = [];
+
+  List<Sale> sales = [];
   int currentPage = 1;
   bool isLoading = false;
   bool hasMore = true;
-  final String baseUrl = "${ApiService.baseUrl}/products";
 
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    fetchSales();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
           hasMore) {
-        fetchProducts();
+        fetchSales();
       }
     });
   }
 
-  Future<void> fetchProducts() async {
+  Future<void> fetchSales() async {
     if (isLoading) return;
 
     setState(() => isLoading = true);
 
     try {
-      final response = await ApiService.fetchPaginated<Product>(
-        "/products",
+      final response = await ApiService.fetchPaginated<Sale>(
+        "/sales",
         currentPage,
-        Product.fromJson,
+        Sale.fromJson,
       );
 
       setState(() {
-        products.addAll(response.data);
+        sales.addAll(response.data);
         currentPage++;
         hasMore = response.hasMore;
       });
     } catch (e) {
-      print("Error al cargar productos: $e");
+      print("Error al cargar ventas: $e");
     } finally {
       setState(() => isLoading = false);
     }
   }
 
   @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Productos", style: TextStyle(color: Colors.white)),
-        backgroundColor: ThemeData().primaryColor,
+        title: Text('Ventas', style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: ListView.builder(
         controller: _scrollController,
-        itemCount: products.length + (isLoading ? 1 : 0),
+        itemCount: sales.length + (isLoading ? 1 : 0),
         itemBuilder: (context, index) {
-          if (index == products.length) {
+          if (index == sales.length) {
             return Center(child: CircularProgressIndicator());
           }
 
-          final product = products[index];
+          final sale = sales[index];
           return ListTile(
-            title: Text(product.name),
-            subtitle: Text(
-              "Precio: \$${product.price} - Stock: ${product.stock}",
+            title: Text("Folio: ${sale.folio}"),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Producto: ${sale.product.name}"),
+                Text("Cantidad: ${sale.quantity}"),
+                Text("Total: ${formatCurrency(sale.totalPrice)}"),
+                Text("Ganancia: \$${sale.profit}"),
+                Text("Fecha: ${sale.date}"),
+              ],
             ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        heroTag: 'add_product',
+        heroTag: 'add-sale',
         onPressed: () async {
-          final response = await Navigator.pushNamed(
-            context,
-            '/create_product',
-          );
+          final response = await Navigator.pushNamed(context, '/create-sale');
           if (response == true) {
             setState(() {
-              products.clear();
+              sales.clear();
               currentPage = 1;
               hasMore = true;
             });
-            fetchProducts();
+            fetchSales();
           }
         },
         child: Icon(Icons.add),

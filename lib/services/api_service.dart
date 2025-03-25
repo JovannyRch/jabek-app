@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:jebek_app/models/product.dart';
+import 'package:jebek_app/screens/user/paginated_response.dart';
 import 'package:jebek_app/services/share_preferences.dart';
 
 class ApiService {
@@ -47,8 +48,12 @@ class ApiService {
     }
   }
 
-  // Método para obtener la lista de productos
-  static Future<List<Product>> getProducts() async {
+  static Future<PaginatedResponse<T>> fetchPaginated<T>(
+    String endpoint,
+    int page,
+    T Function(Map<String, dynamic>) fromJsonT, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
     final token = await Preferences.getToken();
 
     if (token == null) {
@@ -56,42 +61,61 @@ class ApiService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/products'),
-      headers: {'Authorization': 'Bearer $token'},
+      Uri.parse(
+        "$baseUrl$endpoint?page=$page&${queryParameters?.entries.map((e) => '${e.key}=${e.value}').join('&') ?? ''}",
+      ),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body)
-          .map<Product>((product) => Product.fromJson(product))
-          .toList()
-          .cast<Product>();
+      return PaginatedResponse<T>.fromJson(
+        json.decode(response.body),
+        fromJsonT,
+      );
     } else {
-      throw Exception('Error al obtener los productos');
+      throw Exception("Error al cargar los datos: ${response.statusCode}");
     }
   }
 
-  // Método para crear un producto
-  static Future<Map<String, dynamic>> createProduct(
-    String name,
-    double price,
-    int stock,
-  ) async {
+  static Future<Map<String, dynamic>> getReport() async {
     final token = await Preferences.getToken();
-    final response = await http.post(
-      Uri.parse('$baseUrl/products'),
+    final response = await http.get(
+      Uri.parse('$baseUrl/report'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode({'name': name, 'price': price, 'stock': stock}),
     );
-
-    print(response.body);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
       throw Exception('Error al crear el producto');
+    }
+  }
+
+  //create general POST request
+  static Future<Map<String, dynamic>> post(
+    String endpoint,
+    Map<String, dynamic> body,
+  ) async {
+    final token = await Preferences.getToken();
+    final response = await http.post(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Error al realizar la solicitud POST');
     }
   }
 }
