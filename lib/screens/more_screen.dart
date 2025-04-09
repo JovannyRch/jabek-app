@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jebek_app/components/text.dart';
 import 'package:jebek_app/screens/dashboard_screen.dart';
+import 'package:jebek_app/screens/home_screen.dart';
 import 'package:jebek_app/screens/user/profile_screen.dart';
 import 'package:jebek_app/services/share_preferences.dart';
 
@@ -77,7 +78,7 @@ class MoreScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const DashboardScreen(),
+                  builder: (context) =>  HomeScreen(),
                 ),
               );
             },

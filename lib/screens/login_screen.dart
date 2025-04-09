@@ -5,13 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController(
-    /*   text: 'user2@example.com', */
+    text: 'user2@example.com',
   );
   final TextEditingController passwordController = TextEditingController(
-    /*  text: 'password', */
+    text: 'password',
   );
 
-  // Método para iniciar sesión
   void _login(BuildContext context) async {
     try {
       final response = await ApiService.login(
@@ -19,14 +18,11 @@ class LoginScreen extends StatelessWidget {
         passwordController.text,
       );
 
-      // Guardar el token en SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('access_token', response['access_token']);
 
-      // Navegar a la pantalla de lista de productos
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
-      // Mostrar un mensaje de error si falla el inicio de sesión
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
@@ -36,8 +32,9 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /*       appBar: AppBar(title: Text('Iniciar Sesión')), */
+      backgroundColor: Colors.white,
       body: SafeArea(
+      
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(

@@ -1,3 +1,4 @@
+
 class SaleRequest {
   final int productId;
   final int quantity;

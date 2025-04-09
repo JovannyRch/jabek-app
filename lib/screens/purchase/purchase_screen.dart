@@ -92,7 +92,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         onPressed: () async {
           final response = await Navigator.pushNamed(
             context,
-            '/create-purchase',
+            '/create_purchase',
           );
 
           if (response == true) {
