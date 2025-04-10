@@ -4,13 +4,13 @@ import 'package:jebek_app/screens/home_screen.dart';
 import 'package:jebek_app/screens/login_screen.dart';
 import 'package:jebek_app/screens/more_screen.dart';
 import 'package:jebek_app/screens/products/create_product_screen.dart';
+import 'package:jebek_app/screens/products/product_detail_screen.dart';
 import 'package:jebek_app/screens/products/product_list_screen.dart';
 import 'package:jebek_app/screens/purchase/purchase_form_screen.dart';
 import 'package:jebek_app/screens/purchase/purchase_screen.dart';
 import 'package:jebek_app/screens/register_screen.dart';
 import 'package:jebek_app/screens/sales/sale_form_screen.dart';
 import 'package:jebek_app/screens/sales/sales_screen.dart';
-import 'package:jebek_app/screens/user/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const MyApp());

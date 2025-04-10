@@ -65,6 +65,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
       appBar: AppBar(
         title: Text('Compras', style: TextStyle(color: Colors.white)),
         backgroundColor: Theme.of(context).primaryColor,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: ListView.builder(
         controller: _scrollController,

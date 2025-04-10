@@ -59,6 +59,7 @@ class _SalesScreenState extends State<SalesScreen> {
       appBar: AppBar(
         title: Text('Ventas', style: TextStyle(color: Colors.white)),
         backgroundColor: Theme.of(context).primaryColor,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: ListView.builder(
         controller: _scrollController,

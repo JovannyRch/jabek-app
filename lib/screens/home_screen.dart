@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:jebek_app/components/drawer.dart';
 import 'package:jebek_app/services/api_service.dart';
+import 'package:jebek_app/services/share_preferences.dart';
+import 'package:jebek_app/utils/const.dart';
 import 'package:jebek_app/utils/utils.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,6 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double _saleTotal = 0.0;
   double _profitTotal = 0.0;
   double _expenseTotal = 0.0;
+  String _email = '';
 
   List<dynamic> lastTransactions = [];
 
@@ -22,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _fetchReport() async {
+    /* String email = await Preferences.getEmail() ?? ''; */
     setState(() {
       _isLoading = true;
     });
@@ -41,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print('Error al cargar el informe: $e');
     } finally {
+      _email = await Preferences.getEmail() ?? '';
       setState(() {
         _isLoading = false;
       });
@@ -49,27 +55,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appBar = AppBar(
-      title: Text('Inicio'),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.person),
-          onPressed: () {
-            Navigator.pushNamed(context, '/profile');
-          },
-        ),
-      ],
-    );
+    final appBar = AppBar(title: Text('Inicio'));
 
     if (_isLoading) {
       return Scaffold(
         appBar: appBar,
         body: Center(child: CircularProgressIndicator()),
+        drawer: JebekDrawer(),
       );
     }
 
     return Scaffold(
       appBar: appBar,
+      drawer: JebekDrawer(),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {

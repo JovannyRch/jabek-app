@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jebek_app/components/app_logo.dart';
 import 'package:jebek_app/services/api_service.dart';
+import 'package:jebek_app/services/share_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -18,8 +19,17 @@ class LoginScreen extends StatelessWidget {
         passwordController.text,
       );
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('access_token', response['access_token']);
+      if (response['access_token'] == null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al iniciar sesión')));
+        throw Exception('Error al iniciar sesión');
+      }
+
+      await Preferences.saveLogin(
+        response['access_token'],
+        emailController.text,
+      );
 
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
@@ -34,7 +44,6 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-      
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
