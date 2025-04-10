@@ -30,6 +30,27 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> put(
+    String endpoint,
+    Map<String, dynamic> body,
+  ) async {
+    final token = await Preferences.getToken();
+    final response = await http.put(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Error al realizar la solicitud PUT');
+    }
+  }
+
   // Método para iniciar sesión
   static Future<Map<String, dynamic>> login(
     String email,
@@ -117,5 +138,30 @@ class ApiService {
     } else {
       throw Exception('Error al realizar la solicitud POST');
     }
+  }
+
+  static Future<int> delete(String endpoint) async {
+    final token = await Preferences.getToken();
+    final response = await http.delete(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    return response.statusCode;
+  }
+
+  static Future<http.Response> get(String endpoint) async {
+    final token = await Preferences.getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    return response;
   }
 }

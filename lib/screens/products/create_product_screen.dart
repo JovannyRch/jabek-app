@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:jebek_app/components/cost_calculator_dialog.dart';
 import 'package:jebek_app/components/price_calculator_dialog.dart';
+import 'package:jebek_app/models/product.dart';
 import 'package:jebek_app/services/api_service.dart';
 
 class CreateProductScreen extends StatefulWidget {
+  Product? product;
+
+  CreateProductScreen({Key? key, this.product}) : super(key: key);
+
   @override
   _CreateProductScreenState createState() => _CreateProductScreenState();
 }
@@ -16,13 +21,23 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
 
   bool isLoading = false;
   String errorMessage = '';
+  Product? product;
+  bool isEditing = false;
 
-  void _createProduct(BuildContext context) async {
-    setState(() {
-      isLoading = true;
-      errorMessage = '';
-    });
+  @override
+  void initState() {
+    if (widget.product != null) {
+      product = widget.product;
+      nameController.text = product!.name;
+      priceController.text = product!.price.toString();
+      costController.text = product!.cost.toString();
+      stockController.text = product!.stock.toString();
+      isEditing = true;
+    }
+    super.initState();
+  }
 
+  void _createOrUpdateProduct(BuildContext context) async {
     try {
       final name = nameController.text;
       final price = double.tryParse(priceController.text) ?? 0.0;
@@ -33,16 +48,33 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
         throw Exception('Nombre y precio son requeridos');
       }
 
-      final response = await ApiService.post('/products', {
-        'name': name,
-        'price': price,
-        'cost': cost,
-        'stock': stock,
+      setState(() {
+        isLoading = true;
+        errorMessage = '';
       });
+
+      final response =
+          isEditing
+              ? await ApiService.put('/products/${product!.id}', {
+                'name': name,
+                'price': price,
+                'cost': cost,
+                'stock': stock,
+              })
+              : await ApiService.post('/products', {
+                'name': name,
+                'price': price,
+                'cost': cost,
+                'stock': stock,
+              });
 
       // Mostrar mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Producto creado: ${response['name']}')),
+        SnackBar(
+          content: Text(
+            'Producto ${isEditing ? 'actualizado' : 'creado'}: ${response['name']}',
+          ),
+        ),
       );
 
       // Limpiar los campos después de crear el producto
@@ -105,97 +137,122 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Crear Producto', style: TextStyle(color: Colors.white)),
+        title: Text(
+          isEditing ? 'Editar Producto' : 'Crear Producto',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Theme.of(context).primaryColor,
         iconTheme: IconThemeData(color: Colors.white),
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: 'Nombre del Producto',
-                  border: OutlineInputBorder(),
+          child: Form(
+            // Puedes definir una GlobalKey<FormState>() si deseas validación
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Campo para el nombre del producto
+                TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Nombre del Producto',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.label_outline),
+                  ),
                 ),
-              ),
-              SizedBox(height: 16.0),
+                SizedBox(height: 16.0),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: costController,
-                      decoration: InputDecoration(
-                        labelText: 'Costo unitario',
-                        border: OutlineInputBorder(),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: priceController,
+                        keyboardType: TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Precio',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.money_off),
+                        ),
                       ),
-                      keyboardType: TextInputType.number,
+                    ),
+                    SizedBox(width: 8.0),
+                    IconButton(
+                      icon: Icon(Icons.calculate),
+                      onPressed: () => _openSalePriceCalculator(context),
+                      tooltip: 'Calcular precio',
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.0),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: costController,
+                        keyboardType: TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Costo unitario',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.attach_money),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8.0),
+                    IconButton(
+                      icon: Icon(Icons.calculate),
+                      onPressed: () => _openCostCalculator(context),
+                      tooltip: 'Calcular costo',
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.0),
+
+                // Campo para total de unidades
+                TextFormField(
+                  controller: stockController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Total de unidades',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.storefront),
+                  ),
+                ),
+                SizedBox(height: 24.0),
+
+                // Indicador de carga o botón de acción
+                if (isLoading)
+                  Center(child: CircularProgressIndicator())
+                else
+                  ElevatedButton(
+                    onPressed: () => _createOrUpdateProduct(context),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 50),
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
+                    child: Text(
+                      isEditing ? 'Actualizar Producto' : 'Crear Producto',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.calculate),
-                    onPressed: () => _openCostCalculator(context),
-                    tooltip: 'Calcular costo',
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.0),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: priceController,
-                      decoration: InputDecoration(
-                        labelText: 'Precio',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
+
+                // Mensaje de error en caso de que ocurra algo
+                if (errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: Text(
+                      errorMessage,
+                      style: TextStyle(color: Colors.red, fontSize: 16),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.calculate),
-                    onPressed: () => _openSalePriceCalculator(context),
-                    tooltip: 'Calcular costo',
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 16.0),
-              TextField(
-                controller: stockController,
-                decoration: InputDecoration(
-                  labelText: 'Total de unidades',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-              ),
-              SizedBox(height: 24.0),
-              if (isLoading)
-                CircularProgressIndicator()
-              else
-                ElevatedButton(
-                  onPressed: () => _createProduct(context),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50),
-                    backgroundColor: Theme.of(context).primaryColor,
-                  ),
-                  child: Text(
-                    'Crear Producto',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              if (errorMessage.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: Text(
-                    errorMessage,
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
