@@ -11,6 +11,7 @@ import 'package:jebek_app/screens/purchase/purchase_screen.dart';
 import 'package:jebek_app/screens/register_screen.dart';
 import 'package:jebek_app/screens/sales/sale_form_screen.dart';
 import 'package:jebek_app/screens/sales/sales_screen.dart';
+import 'package:jebek_app/screens/stats_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const MyApp());
@@ -52,7 +53,7 @@ class MyApp extends StatelessWidget {
         '/purchases': (context) => PurchaseScreen(),
         '/create_purchase': (context) => PurchaseFormScreen(),
         '/profile': (context) => MoreScreen(),
-        '/dashboard': (context) => DashboardScreen(),
+        '/stats': (context) => SalesStatisticsScreen(),
       },
     );
   }

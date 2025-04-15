@@ -58,115 +58,102 @@ class _CostCalculatorDialogState extends State<CostCalculatorDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Calculadora de Costos'),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+      title: const Text(
+        'Calculadora de Costos',
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
-              controller: lotPriceController,
-              decoration: InputDecoration(
-                labelText: 'Precio total del lote (\$)',
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (_) => _calculateCost(),
+            // Sección: Componentes de costo
+            _buildTextField(
+              lotPriceController,
+              'Precio total del lote (\$)',
+              icon: Icons.attach_money,
             ),
-            TextField(
-              controller: customsController,
-              decoration: InputDecoration(
-                labelText: 'Impuestos aduaneros (\$)',
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (_) => _calculateCost(),
+            const SizedBox(height: 10),
+            _buildTextField(
+              customsController,
+              'Impuestos aduaneros (\$)',
+              icon: Icons.money_off,
             ),
-            TextField(
-              controller: shippingController,
-              decoration: InputDecoration(labelText: 'Costo de envío (\$)'),
-              keyboardType: TextInputType.number,
-              onChanged: (_) => _calculateCost(),
+            const SizedBox(height: 10),
+            _buildTextField(
+              shippingController,
+              'Costo de envío (\$)',
+              icon: Icons.local_shipping,
             ),
-            TextField(
-              controller: storageController,
-              decoration: InputDecoration(
-                labelText: 'Costos de almacenamiento (\$)',
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (_) => _calculateCost(),
+            const SizedBox(height: 10),
+            _buildTextField(
+              storageController,
+              'Costos de almacenamiento (\$)',
+              icon: Icons.warehouse,
             ),
-            TextField(
-              controller: adminController,
-              decoration: InputDecoration(
-                labelText: 'Costos administrativos (\$)',
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (_) => _calculateCost(),
+            const SizedBox(height: 10),
+            _buildTextField(
+              adminController,
+              'Costos administrativos (\$)',
+              icon: Icons.business_center,
             ),
-            TextField(
-              controller: generalExpensesController,
-              decoration: InputDecoration(labelText: 'Gastos (\$)'),
-              keyboardType: TextInputType.number,
-              onChanged: (_) => _calculateCost(),
+            const SizedBox(height: 10),
+            _buildTextField(
+              generalExpensesController,
+              'Gastos (\$)',
+              icon: Icons.receipt_long,
             ),
-            TextField(
-              controller: fixedCostsController,
-              decoration: InputDecoration(labelText: 'Gastos fijos (\$)'),
-              keyboardType: TextInputType.number,
-              onChanged: (_) => _calculateCost(),
+            const SizedBox(height: 10),
+            _buildTextField(
+              fixedCostsController,
+              'Gastos fijos (\$)',
+              icon: Icons.money,
             ),
 
-            SizedBox(height: 10),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Total de los costos de compra (general)',
-                enabled: false,
-              ),
-              readOnly: true,
-              controller: TextEditingController(
-                text: formatCurrency(generalExpensesTotal),
-              ),
+            const SizedBox(height: 20),
+            // Sección: Totales calculados
+            _buildReadOnlyField(
+              formatCurrency(generalExpensesTotal),
+              'Total de costos de compra (general)',
             ),
-            SizedBox(height: 10),
-            TextField(
-              controller: percentageController,
-              decoration: InputDecoration(
-                labelText: 'Porcentaje de los costos a cada producto (%)',
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (_) => _calculateCost(),
+            const SizedBox(height: 10),
+            _buildTextField(
+              percentageController,
+              'Porcentaje de los costos a cada producto (%)',
+              icon: Icons.percent,
             ),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Total de costos para el producto (\$)',
-                enabled: false,
-              ),
-              readOnly: true,
-              controller: TextEditingController(
-                text: formatCurrency(totalCostsProduct),
-              ),
+            const SizedBox(height: 10),
+            _buildReadOnlyField(
+              formatCurrency(totalCostsProduct),
+              'Total de costos para el producto (\$)',
             ),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Suma de precio más el costo (\$)',
-                enabled: false,
+            const SizedBox(height: 10),
+            _buildReadOnlyField(
+              formatCurrency(
+                totalCostsProduct +
+                    (double.tryParse(lotPriceController.text) ?? 0),
               ),
-              readOnly: true,
-              controller: TextEditingController(
-                text: formatCurrency(
-                  totalCostsProduct +
-                      (double.tryParse(lotPriceController.text) ?? 0),
+              'Suma de precio más el costo (\$)',
+            ),
+            const SizedBox(height: 10),
+            _buildTextField(
+              quantityController,
+              'Cantidad de productos',
+              icon: Icons.confirmation_number,
+            ),
+
+            const SizedBox(height: 20),
+            // Resumen final: Costo unitario calculado
+            Center(
+              child: Text(
+                'Costo unitario: ${formatCurrency(calculatedCost)}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
-            ),
-            TextField(
-              controller: quantityController,
-              decoration: InputDecoration(labelText: 'Cantidad de productos'),
-              keyboardType: TextInputType.number,
-              onChanged: (_) => _calculateCost(),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Costo unitario: ${formatCurrency(calculatedCost)}',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -174,13 +161,55 @@ class _CostCalculatorDialogState extends State<CostCalculatorDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Cancelar'),
+          child: const Text('Cancelar'),
         ),
         ElevatedButton(
           onPressed: () => Navigator.pop(context, calculatedCost),
-          child: Text('Usar este costo'),
+          child: const Text('Usar este costo'),
         ),
       ],
+    );
+  }
+
+  /// Función helper para construir un TextField editable con un diseño uniforme.
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label, {
+    IconData? icon,
+    TextInputType keyboardType = TextInputType.number,
+  }) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: icon != null ? Icon(icon) : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 16,
+        ),
+      ),
+      keyboardType: keyboardType,
+      onChanged: (_) => _calculateCost(),
+    );
+  }
+
+  /// Función helper para construir un TextField de solo lectura (para mostrar totales)
+  Widget _buildReadOnlyField(String value, String label) {
+    return TextField(
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        filled: true,
+        fillColor: Colors.grey.shade200,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 16,
+        ),
+      ),
+      controller: TextEditingController(text: value),
+      readOnly: true,
+      enabled: false,
     );
   }
 }

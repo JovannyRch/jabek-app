@@ -167,31 +167,6 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                   children: [
                     Expanded(
                       child: TextFormField(
-                        controller: priceController,
-                        keyboardType: TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
-                        decoration: InputDecoration(
-                          labelText: 'Precio',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.money_off),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8.0),
-                    IconButton(
-                      icon: Icon(Icons.calculate),
-                      onPressed: () => _openSalePriceCalculator(context),
-                      tooltip: 'Calcular precio',
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16.0),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
                         controller: costController,
                         keyboardType: TextInputType.numberWithOptions(
                           decimal: true,
@@ -208,6 +183,30 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                       icon: Icon(Icons.calculate),
                       onPressed: () => _openCostCalculator(context),
                       tooltip: 'Calcular costo',
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.0),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: priceController,
+                        keyboardType: TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Precio',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.money_off),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8.0),
+                    IconButton(
+                      icon: Icon(Icons.calculate),
+                      onPressed: () => _openSalePriceCalculator(context),
+                      tooltip: 'Calcular precio',
                     ),
                   ],
                 ),

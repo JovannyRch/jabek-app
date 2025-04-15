@@ -8,10 +8,9 @@ class Sale {
   final String unitPrice;
   final int quantity;
   final String totalPrice;
-  final String profit;
-  final String date;
-  final Product product;
-
+  final double profit;
+  final DateTime date;
+  final Product? product;
 
   Sale({
     required this.id,
@@ -23,7 +22,7 @@ class Sale {
     required this.totalPrice,
     required this.profit,
     required this.date,
-    required this.product,
+    this.product,
   });
 
   factory Sale.fromJson(Map<String, dynamic> json) {
@@ -35,8 +34,8 @@ class Sale {
       unitPrice: json['unit_price'],
       quantity: json['quantity'],
       totalPrice: json['total_price'],
-      profit: json['profit'],
-      date: json['date'],
+      profit: double.parse(json['profit'].toString()),
+      date: DateTime.parse(json['date']),
       product: Product.fromJson(json['product']),
     );
   }

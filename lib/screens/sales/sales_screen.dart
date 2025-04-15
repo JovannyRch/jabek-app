@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jebek_app/models/sale.dart';
+import 'package:jebek_app/screens/sales/sale_detail_screen.dart';
 import 'package:jebek_app/services/api_service.dart';
 import 'package:jebek_app/utils/utils.dart';
 
@@ -15,6 +16,7 @@ class _SalesScreenState extends State<SalesScreen> {
   int currentPage = 1;
   bool isLoading = false;
   bool hasMore = true;
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -39,6 +41,8 @@ class _SalesScreenState extends State<SalesScreen> {
         "/sales",
         currentPage,
         Sale.fromJson,
+        queryParameters:
+            searchQuery.isNotEmpty ? {"search": searchQuery} : null,
       );
 
       setState(() {
@@ -57,48 +61,218 @@ class _SalesScreenState extends State<SalesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ventas', style: TextStyle(color: Colors.white)),
+        title: Text(
+          searchQuery.isNotEmpty ? "Búsqueda: $searchQuery" : "Ventas",
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Theme.of(context).primaryColor,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          searchQuery.isNotEmpty
+              ? IconButton(
+                icon: const Icon(Icons.clear, color: Colors.red),
+                onPressed: () {
+                  setState(() {
+                    searchQuery = '';
+                    sales.clear();
+                    currentPage = 1;
+                    hasMore = true;
+                  });
+                  fetchSales();
+                },
+              )
+              : const SizedBox(),
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              _openSearchDialog();
+            },
+          ),
+        ],
       ),
-      body: ListView.builder(
-        controller: _scrollController,
-        itemCount: sales.length + (isLoading ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == sales.length) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          final sale = sales[index];
-          return ListTile(
-            title: Text("Folio: ${sale.folio}"),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Producto: ${sale.product.name}"),
-                Text("Cantidad: ${sale.quantity}"),
-                Text("Total: ${formatCurrency(sale.totalPrice)}"),
-                Text("Ganancia: \$${sale.profit}"),
-                Text("Fecha: ${sale.date}"),
-              ],
-            ),
-          );
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            sales.clear();
+            currentPage = 1;
+            hasMore = true;
+          });
+          await fetchSales();
         },
+        child:
+            sales.isEmpty && searchQuery.isNotEmpty && !isLoading
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.search_off, size: 50, color: Colors.grey),
+                      SizedBox(height: 16),
+                      Text(
+                        "No se encontraron ventas con el folio: $searchQuery",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            searchQuery = '';
+                            sales.clear();
+                            currentPage = 1;
+                            hasMore = true;
+                          });
+                          fetchSales();
+                        },
+                        child: Text("Ver todas las ventas"),
+                      ),
+                    ],
+                  ),
+                )
+                : ListView.builder(
+                  controller: _scrollController,
+                  itemCount: sales.length + (isLoading ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == sales.length) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final sale = sales[index];
+                    return _renderSaleCard(sale);
+                  },
+                ),
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'add-sale',
         onPressed: () async {
           final response = await Navigator.pushNamed(context, '/create-sale');
           if (response == true) {
-            setState(() {
-              sales.clear();
-              currentPage = 1;
-              hasMore = true;
-            });
-            fetchSales();
+            _refreshData();
           }
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _refreshData() {
+    setState(() {
+      searchQuery = '';
+      sales.clear();
+      currentPage = 1;
+      hasMore = true;
+    });
+    fetchSales();
+  }
+
+  void _openSearchDialog() async {
+    TextEditingController searchController = TextEditingController();
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Buscar Venta"),
+          content: TextField(
+            controller: searchController,
+            decoration: InputDecoration(
+              labelText: "Ingrese folio de venta",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            keyboardType: TextInputType.number,
+          ),
+          actions: [
+            TextButton(
+              child: const Text("Cancelar"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            ElevatedButton(
+              child: const Text("Buscar"),
+              onPressed: () {
+                Navigator.of(context).pop(searchController.text);
+                setState(() {
+                  searchQuery = searchController.text;
+                  sales.clear();
+                  currentPage = 1;
+                  hasMore = true;
+                });
+                fetchSales();
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    // Si se ingresó un folio, actualizamos la búsqueda y reiniciamos la lista
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        searchQuery = result;
+        sales.clear();
+        currentPage = 1;
+        hasMore = true;
+      });
+      fetchSales();
+    }
+  }
+
+  Widget _renderSaleCard(Sale sale) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(12.0),
+        leading: CircleAvatar(
+          backgroundColor: Theme.of(context).primaryColor,
+          child: const Icon(Icons.receipt, color: Colors.white),
+        ),
+        title: Text(
+          "Folio: ${sale.folio}",
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text("Producto: ${sale.product?.name}"),
+            const SizedBox(height: 4),
+            Text("Cantidad: ${sale.quantity}"),
+            const SizedBox(height: 4),
+            Text("Total: ${formatCurrency(sale.totalPrice)}"),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Text("Ganancia: "),
+                Text(
+                  formatCurrency(sale.profit),
+                  style: TextStyle(
+                    color: sale.profit >= 0 ? Colors.green : Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "Fecha: ${sale.date}",
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () async {
+          final response = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SaleDetailScreen(sale: sale),
+            ),
+          );
+
+          if (response == true) {
+            _refreshData();
+          }
+        },
       ),
     );
   }

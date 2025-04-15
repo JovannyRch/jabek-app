@@ -84,7 +84,7 @@ class _JebekDrawerState extends State<JebekDrawer> {
           ),
           ListTile(
             leading: Icon(Icons.inventory),
-            title: Text("Gastos"),
+            title: Text("Compras"),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, '/purchases');

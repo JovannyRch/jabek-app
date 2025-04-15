@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:jebek_app/models/product.dart';
+import 'package:jebek_app/models/sale.dart';
 import 'package:jebek_app/screens/user/paginated_response.dart';
 import 'package:jebek_app/services/share_preferences.dart';
 
@@ -110,7 +111,6 @@ class ApiService {
         'Authorization': 'Bearer $token',
       },
     );
-
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
@@ -152,10 +152,18 @@ class ApiService {
     return response.statusCode;
   }
 
-  static Future<http.Response> get(String endpoint) async {
+  static Future<http.Response> get(
+    String endpoint, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
     final token = await Preferences.getToken();
+    print(
+      "$baseUrl$endpoint${queryParameters != null ? '?' + (queryParameters?.entries.map((e) => '${e.key}=${e.value}').join('&') ?? '') : ''}",
+    );
     final response = await http.get(
-      Uri.parse('$baseUrl$endpoint'),
+      Uri.parse(
+        "$baseUrl$endpoint${queryParameters != null ? '?' + (queryParameters?.entries.map((e) => '${e.key}=${e.value}').join('&') ?? '') : ''}",
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

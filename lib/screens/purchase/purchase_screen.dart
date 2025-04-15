@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jebek_app/models/expense.dart';
+import 'package:jebek_app/screens/purchase/purchase_detail_screen.dart';
 import 'package:jebek_app/services/api_service.dart';
 import 'package:jebek_app/utils/utils.dart';
 
@@ -47,7 +48,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         hasMore = response.hasMore;
       });
     } catch (e) {
-      print("Error al cargar gastos: $e");
+      print("Error al cargar compras: $e");
     } finally {
       setState(() => isLoading = false);
     }
@@ -63,30 +64,39 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Compras', style: TextStyle(color: Colors.white)),
+        title: const Text('Compras', style: TextStyle(color: Colors.white)),
         backgroundColor: Theme.of(context).primaryColor,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // Aquí podrías implementar una búsqueda o filtro para las compras.
+            },
+          ),
+        ],
       ),
-      body: ListView.builder(
-        controller: _scrollController,
-        itemCount: expenses.length + (isLoading ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == expenses.length) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          final expense = expenses[index];
-          return ListTile(
-            title: Text(expense.concept),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Monto: ${formatCurrency(expense.amount)}"),
-                Text("Fecha: ${expense.date}"),
-              ],
-            ),
-          );
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            expenses.clear();
+            currentPage = 1;
+            hasMore = true;
+          });
+          await fetchExpenses();
         },
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: expenses.length + (isLoading ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == expenses.length) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final expense = expenses[index];
+            return _renderExpenseItem(expense);
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'create-expense',
@@ -95,17 +105,66 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
             context,
             '/create_purchase',
           );
-
           if (response == true) {
-            setState(() {
-              expenses.clear();
-              currentPage = 1;
-              hasMore = true;
-            });
-            fetchExpenses();
+            _refreshData();
           }
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _refreshData() {
+    setState(() {
+      expenses.clear();
+      currentPage = 1;
+      hasMore = true;
+    });
+    fetchExpenses();
+  }
+
+  Widget _renderExpenseItem(Expense expense) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(12.0),
+        leading: CircleAvatar(
+          backgroundColor: Theme.of(context).primaryColor,
+          child: const Icon(Icons.shopping_cart, color: Colors.white),
+        ),
+        title: Text(
+          expense.concept,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Monto: ${formatCurrency(expense.amount)}"),
+              const SizedBox(height: 4),
+              Text(
+                "Fecha: ${expense.date}",
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () async {
+          final response = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExpenseDetailScreen(expense: expense),
+            ),
+          );
+
+          if (response == true) {
+            _refreshData();
+          }
+        },
       ),
     );
   }

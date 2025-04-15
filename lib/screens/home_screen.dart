@@ -15,7 +15,6 @@ class _HomeScreenState extends State<HomeScreen> {
   double _saleTotal = 0.0;
   double _profitTotal = 0.0;
   double _expenseTotal = 0.0;
-  String _email = '';
 
   List<dynamic> lastTransactions = [];
 
@@ -26,7 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _fetchReport() async {
-    /* String email = await Preferences.getEmail() ?? ''; */
     setState(() {
       _isLoading = true;
     });
@@ -36,9 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
       if (response != null) {
         setState(() {
           lastTransactions = response['last_transactions'];
-          _saleTotal = double.parse(response['sales']);
-          _profitTotal = double.parse(response['profit']);
-          _expenseTotal = double.parse(response['expenses']);
+          _saleTotal = double.parse(response['sales'].toString());
+          _profitTotal = double.parse(response['profit'].toString());
+          _expenseTotal = double.parse(response['expenses'].toString());
         });
       } else {
         print('No se encontraron datos para mostrar.');
@@ -46,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print('Error al cargar el informe: $e');
     } finally {
-      _email = await Preferences.getEmail() ?? '';
       setState(() {
         _isLoading = false;
       });
@@ -105,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               SizedBox(width: 10),
                               _buildSummaryCard(
-                                'Gastos',
+                                'Compras',
                                 formatCurrency(_expenseTotal),
                                 Icons.inventory,
                                 Colors.orange,
@@ -137,19 +134,19 @@ class _HomeScreenState extends State<HomeScreen> {
                               context,
                               'Nueva Venta',
                               Icons.point_of_sale,
-                              '/sales',
+                              '/create-sale',
                             ),
                             _buildActionButton(
                               context,
                               'Registrar Compra',
                               Icons.shopping_bag,
-                              '/purchases',
+                              '/create_purchase',
                             ),
                             _buildActionButton(
                               context,
-                              'Reportes',
+                              'Estadísticas',
                               Icons.analytics,
-                              '/reports',
+                              '/stats',
                             ),
                           ],
                         ),
