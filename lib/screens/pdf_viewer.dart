@@ -1,7 +1,7 @@
 import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:jebek_app/services/share_preferences.dart';
-/* import 'package:share_extend/share_extend.dart'; */
+import 'package:share_plus/share_plus.dart';
 
 class PdfViewerScreen extends StatefulWidget {
   final String url;
@@ -43,7 +43,16 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   }
 
   _share() async {
-    /*   ShareExtend.share(doc!.filePath!, "file"); */
+    String filePath = doc!.filePath ?? "";
+
+    if (filePath.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo encontrar el archivo PDF')),
+      );
+      return;
+    }
+
+    await Share.shareXFiles([XFile(filePath)]);
   }
 
   @override

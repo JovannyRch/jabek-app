@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jebek_app/screens/pdf_viewer.dart';
 import 'package:jebek_app/services/api_service.dart';
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:jebek_app/services/share_preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:open_file/open_file.dart';
+import 'package:share_plus/share_plus.dart';
 
 enum ReportType { productCatalog, salesList, purchasesList }
 
@@ -54,13 +61,7 @@ class _ReportScreenState extends State<ReportScreen> {
     }
   }
 
-  // Función para exportar el reporte
   Future<void> _exportReport() async {
-    // Aquí puedes construir el endpoint en función de la opción seleccionada.
-    // Por ejemplo:
-    //  - Producto: "/reports/products?format=excel" ó "/reports/products?format=pdf"
-    //  - Ventas: "/reports/sales?format=excel&start_date=YYYY-MM-DD&end_date=YYYY-MM-DD"
-    //  - Compras: "/reports/purchases?format=excel&start_date=YYYY-MM-DD&end_date=YYYY-MM-DD"
     String endpoint = '';
     String formatParam = _selectedFormat == FileFormat.excel ? 'excel' : 'pdf';
 
@@ -89,8 +90,9 @@ class _ReportScreenState extends State<ReportScreen> {
             "${ApiService.baseUrl}/report/purchases?format=$formatParam&start_date=${_dateFormatter.format(_startDate!)}&end_date=${_dateFormatter.format(_endDate!)}";
         break;
     }
-    print("Endpoint: $endpoint");
+    /* 
     if (formatParam == 'excel') {
+     
     } else {
       Navigator.push(
         context,
@@ -99,6 +101,52 @@ class _ReportScreenState extends State<ReportScreen> {
               (context) => PdfViewerScreen(url: endpoint, title: "Reporte PDF"),
         ),
       );
+    } */
+
+    await _downloadFile(
+      endpoint,
+      extension: formatParam == 'excel' ? 'xlsx' : 'pdf',
+    );
+  }
+
+  Future<void> _downloadFile(String url, {required String extension}) async {
+    // 1. Obtener directorio privado de la app
+    Directory dir = await getApplicationDocumentsDirectory();
+    // (Si prefieres el externo específico de tu app en Android,
+    // usa getExternalStorageDirectory() en su lugar, también sin permiso.)
+
+    // 2. Construir la ruta con timestamp
+    final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+    final filePath = '${dir.path}/reporte_$timestamp.$extension';
+
+    // 3. Descargar con Dio
+    try {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Descargando reporte...")));
+      final token = await Preferences.getToken();
+
+      await Dio().download(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+        filePath,
+        onReceiveProgress: (rec, total) {},
+      );
+
+      /*  ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Descargado en: $filePath"))); */
+
+      await Share.shareXFiles([XFile(filePath)]);
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error al descargar: $e")));
     }
   }
 
