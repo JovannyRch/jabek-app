@@ -68,7 +68,7 @@ class _SalesStatisticsScreenState extends State<SalesStatisticsScreen> {
       child: Container(
         width: MediaQuery.of(context).size.width * 0.4,
         height: 110,
-        padding: const EdgeInsets.all(16),
+
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -236,6 +236,12 @@ class _SalesStatisticsScreenState extends State<SalesStatisticsScreen> {
               TimeIntervalSelector(
                 period: _selectedPeriod,
                 onPeriodChanged: (salePeriod, startDate, endDate) {
+                  if (salePeriod == SalesPeriod.custom) {
+                    if (startDate == null || endDate == null) {
+                      return;
+                    }
+                  }
+
                   setState(() {
                     _selectedPeriod = salePeriod;
                     _customStartDate = startDate;

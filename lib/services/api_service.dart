@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:jebek_app/models/product.dart';
-import 'package:jebek_app/models/sale.dart';
 import 'package:jebek_app/screens/user/paginated_response.dart';
 import 'package:jebek_app/services/share_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://jebek-fc1af0e483ef.herokuapp.com/api';
+  static const String baseUrl = 'https://jebek-b7bf3e65064d.herokuapp.com/api';
 
   // Método para registrar un usuario
   static Future<Map<String, dynamic>> register(

@@ -9,6 +9,7 @@ import 'package:jebek_app/screens/products/product_list_screen.dart';
 import 'package:jebek_app/screens/purchase/purchase_form_screen.dart';
 import 'package:jebek_app/screens/purchase/purchase_screen.dart';
 import 'package:jebek_app/screens/register_screen.dart';
+import 'package:jebek_app/screens/report_screen.dart';
 import 'package:jebek_app/screens/sales/sale_form_screen.dart';
 import 'package:jebek_app/screens/sales/sales_screen.dart';
 import 'package:jebek_app/screens/stats_screen.dart';
@@ -54,6 +55,7 @@ class MyApp extends StatelessWidget {
         '/create_purchase': (context) => PurchaseFormScreen(),
         '/profile': (context) => MoreScreen(),
         '/stats': (context) => SalesStatisticsScreen(),
+        '/reports': (context) => ReportScreen(),
       },
     );
   }

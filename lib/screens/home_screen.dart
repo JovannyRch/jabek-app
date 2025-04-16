@@ -186,6 +186,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                       lastTransactions[index]['amount'],
                                     ),
                                   ),
+                                  /* onTap: () {
+                                    final isSale =
+                                        lastTransactions[index]['type'] ==
+                                        'sale';
+                                    final id = lastTransactions[index]['id'];
+
+                                    
+
+                                  } */
                                 ),
                               ),
                         ),

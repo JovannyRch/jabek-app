@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:jebek_app/models/product.dart';
 import 'package:jebek_app/models/sale.dart';
 import 'package:jebek_app/screens/sales/sale_detail_screen.dart';
 import 'package:jebek_app/services/api_service.dart';
 import 'package:jebek_app/utils/utils.dart';
 
 class SalesScreen extends StatefulWidget {
+  Product? product;
+
+  SalesScreen({Key? key, this.product}) : super(key: key);
+
   @override
   State<SalesScreen> createState() => _SalesScreenState();
 }
@@ -38,7 +43,9 @@ class _SalesScreenState extends State<SalesScreen> {
 
     try {
       final response = await ApiService.fetchPaginated<Sale>(
-        "/sales",
+        widget.product != null
+            ? "/sales/product/${widget.product?.id}"
+            : "/sales",
         currentPage,
         Sale.fromJson,
         queryParameters:
@@ -62,7 +69,11 @@ class _SalesScreenState extends State<SalesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          searchQuery.isNotEmpty ? "Búsqueda: $searchQuery" : "Ventas",
+          searchQuery.isNotEmpty
+              ? "Búsqueda: $searchQuery"
+              : widget.product != null
+              ? "Ventas de ${widget.product?.name}"
+              : "Ventas",
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Theme.of(context).primaryColor,
@@ -82,12 +93,14 @@ class _SalesScreenState extends State<SalesScreen> {
                 },
               )
               : const SizedBox(),
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              _openSearchDialog();
-            },
-          ),
+          widget.product == null
+              ? IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () {
+                  _openSearchDialog();
+                },
+              )
+              : const SizedBox(),
         ],
       ),
       body: RefreshIndicator(
