@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
 import 'package:jebek_app/components/benefit_item.dart';
+import 'package:jebek_app/utils/const.dart';
 
 String formatCurrency(dynamic amount) {
   if (amount is String) {
@@ -159,4 +160,68 @@ Future<void> showProVersionDialog(BuildContext context) {
           ),
         ),
   );
+}
+
+Future<bool> checkProductsLimit(int count, BuildContext context) async {
+  if (!IS_PRO_VERSION && count >= MAX_PRODUCTS) {
+    //show snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          "¡Actualízate a la versión PRO para agregar más productos!",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+    //delay 3 seconds
+    await Future.delayed(const Duration(seconds: 1));
+    showProVersionDialog(context);
+    return false;
+  }
+  return true;
+}
+
+Future<bool> checkSalesLimit(int count, BuildContext context) async {
+  if (!IS_PRO_VERSION && count >= MAX_SALES) {
+    //show snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          "¡Actualízate a la versión PRO para agregar más ventas!",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+    //delay 3 seconds
+    await Future.delayed(const Duration(seconds: 1));
+    showProVersionDialog(context);
+    return false;
+  }
+  return true;
+}
+
+Future<bool> checkPurchasesLimit(int count, BuildContext context) async {
+  if (!IS_PRO_VERSION && count >= MAX_PURCHASES) {
+    //show snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          "¡Actualízate a la versión PRO para agregar más compras!",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+    //delay 3 seconds
+    await Future.delayed(const Duration(seconds: 1));
+    showProVersionDialog(context);
+    return false;
+  }
+
+  return true;
 }

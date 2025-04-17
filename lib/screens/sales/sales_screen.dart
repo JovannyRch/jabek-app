@@ -22,6 +22,7 @@ class _SalesScreenState extends State<SalesScreen> {
   bool isLoading = false;
   bool hasMore = true;
   String searchQuery = '';
+  int totalSales = 0;
 
   @override
   void initState() {
@@ -56,6 +57,7 @@ class _SalesScreenState extends State<SalesScreen> {
         sales.addAll(response.data);
         currentPage++;
         hasMore = response.hasMore;
+        totalSales = response.total;
       });
     } catch (e) {
       print("Error al cargar ventas: $e");
@@ -156,6 +158,10 @@ class _SalesScreenState extends State<SalesScreen> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'add-sale',
         onPressed: () async {
+          final check = await checkSalesLimit(totalSales, context);
+          if (!check) {
+            return;
+          }
           final response = await Navigator.pushNamed(context, '/create-sale');
           if (response == true) {
             _refreshData();

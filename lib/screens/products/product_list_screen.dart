@@ -222,21 +222,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return FloatingActionButton(
       heroTag: 'add_product',
       onPressed: () async {
-        if (!IS_PRO_VERSION && totalProducts >= MAX_PRODUCTS) {
-          //show snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text(
-                "¡Actualízate a la versión PRO para agregar más productos!",
-                style: TextStyle(color: Colors.white),
-              ),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-          //delay 3 seconds
-          await Future.delayed(const Duration(seconds: 1));
-          showProVersionDialog(context);
+        final check = await checkProductsLimit(totalProducts, context);
+        if (!check) {
           return;
         }
 

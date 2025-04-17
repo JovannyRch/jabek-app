@@ -23,6 +23,9 @@ class _HomeScreenState extends State<HomeScreen> {
   double _profitTotal = 0.0;
   double _expenseTotal = 0.0;
   Map<String, dynamic>? _statsData;
+  int _productsCount = 0;
+  int _salesCount = 0;
+  int _purchasesCount = 0;
 
   List<dynamic> lastTransactions = [];
 
@@ -45,6 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
           _saleTotal = double.parse(response['sales'].toString());
           _profitTotal = double.parse(response['profit'].toString());
           _expenseTotal = double.parse(response['expenses'].toString());
+          _productsCount = int.parse(response['products_count'].toString());
+          _salesCount = int.parse(response['sales_count'].toString());
+          _purchasesCount = int.parse(response['expenses_count'].toString());
           _statsData = {
             'sales_chart': response['sales_chart'],
             'sales_chart_shadow': response['sales_chart_shadow'],
@@ -343,15 +349,25 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisSpacing: 12,
           children: [
             _buildActionButton('Registrar Producto', Icons.add_box, () async {
-              final response = await Navigator.pushNamed(
-                context,
-                '/create_product',
-              );
-              if (response == true) {
-                await _fetchReport();
-              }
+              checkProductsLimit(_productsCount, context).then((future) async {
+                if (future == true) {
+                  final response = await Navigator.pushNamed(
+                    context,
+                    '/create_product',
+                  );
+                  if (response == true) {
+                    await _fetchReport();
+                  }
+                }
+              });
             }),
             _buildActionButton('Nueva Venta', Icons.point_of_sale, () async {
+              final check = await checkSalesLimit(_salesCount, context);
+
+              if (!check) {
+                return;
+              }
+
               final response = await Navigator.pushNamed(
                 context,
                 '/create-sale',
@@ -364,6 +380,15 @@ class _HomeScreenState extends State<HomeScreen> {
               'Registrar Compra',
               Icons.shopping_bag,
               () async {
+                final check = await checkPurchasesLimit(
+                  _purchasesCount,
+                  context,
+                );
+
+                if (!check) {
+                  return;
+                }
+
                 final response = await Navigator.pushNamed(
                   context,
                   '/create_purchase',

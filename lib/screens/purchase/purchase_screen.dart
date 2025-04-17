@@ -16,6 +16,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   int currentPage = 1;
   bool isLoading = false;
   bool hasMore = true;
+  int totalExpenses = 0;
 
   @override
   void initState() {
@@ -46,6 +47,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         expenses.addAll(response.data);
         currentPage++;
         hasMore = response.hasMore;
+        totalExpenses = response.total;
       });
     } catch (e) {
       print("Error al cargar compras: $e");
@@ -101,6 +103,12 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'create-expense',
         onPressed: () async {
+          final check = await checkPurchasesLimit(totalExpenses, context);
+
+          if (!check) {
+            return;
+          }
+
           final response = await Navigator.pushNamed(
             context,
             '/create_purchase',
