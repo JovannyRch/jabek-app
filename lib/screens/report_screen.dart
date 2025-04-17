@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:jebek_app/screens/pdf_viewer.dart';
+import 'package:jebek_app/components/time_interval_selector.dart';
 import 'package:jebek_app/services/api_service.dart';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:jebek_app/services/share_preferences.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 enum ReportType { productCatalog, salesList, purchasesList }
@@ -29,9 +28,10 @@ class _ReportScreenState extends State<ReportScreen> {
   DateTime? _startDate;
   DateTime? _endDate;
 
+  SalesPeriod _selectedPeriod = SalesPeriod.currentMonth;
   final DateFormat _dateFormatter = DateFormat('yyyy-MM-dd');
 
-  Future<void> _selectStartDate(BuildContext context) async {
+  /*   Future<void> _selectStartDate(BuildContext context) async {
     final DateTime initialDate = _startDate ?? DateTime.now();
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -59,7 +59,7 @@ class _ReportScreenState extends State<ReportScreen> {
         _endDate = picked;
       });
     }
-  }
+  } */
 
   Future<void> _exportReport() async {
     String endpoint = '';
@@ -70,39 +70,23 @@ class _ReportScreenState extends State<ReportScreen> {
         endpoint = "${ApiService.baseUrl}/report/products?format=$formatParam";
         break;
       case ReportType.salesList:
-        if (_startDate == null || _endDate == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Seleccione el rango de fechas")),
-          );
-          return;
+        if (_startDate != null && _endDate != null) {
+          endpoint =
+              "${ApiService.baseUrl}/report/sales?format=$formatParam&start_date=${_dateFormatter.format(_startDate!)}&end_date=${_dateFormatter.format(_endDate!)}";
+        } else {
+          endpoint = "${ApiService.baseUrl}/report/sales?format=$formatParam";
         }
-        endpoint =
-            "${ApiService.baseUrl}/report/sales?format=$formatParam&start_date=${_dateFormatter.format(_startDate!)}&end_date=${_dateFormatter.format(_endDate!)}";
         break;
       case ReportType.purchasesList:
-        if (_startDate == null || _endDate == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Seleccione el rango de fechas")),
-          );
-          return;
+        if (_startDate != null && _endDate != null) {
+          endpoint =
+              "${ApiService.baseUrl}/report/expenses?format=$formatParam&start_date=${_dateFormatter.format(_startDate!)}&end_date=${_dateFormatter.format(_endDate!)}";
+        } else {
+          endpoint =
+              "${ApiService.baseUrl}/report/expenses?format=$formatParam";
         }
-        endpoint =
-            "${ApiService.baseUrl}/report/purchases?format=$formatParam&start_date=${_dateFormatter.format(_startDate!)}&end_date=${_dateFormatter.format(_endDate!)}";
         break;
     }
-    /* 
-    if (formatParam == 'excel') {
-     
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder:
-              (context) => PdfViewerScreen(url: endpoint, title: "Reporte PDF"),
-        ),
-      );
-    } */
-
     await _downloadFile(
       endpoint,
       extension: formatParam == 'excel' ? 'xlsx' : 'pdf',
@@ -138,11 +122,7 @@ class _ReportScreenState extends State<ReportScreen> {
         onReceiveProgress: (rec, total) {},
       );
 
-      /*  ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Descargado en: $filePath"))); */
-
-      await Share.shareXFiles([XFile(filePath)]);
+      await showFileOptionsDialog(context, filePath);
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -193,10 +173,80 @@ class _ReportScreenState extends State<ReportScreen> {
                 }
               },
             ),
-            const SizedBox(height: 20),
 
             if (_selectedReportType == ReportType.salesList ||
                 _selectedReportType == ReportType.purchasesList)
+              TimeIntervalSelector(
+                period: _selectedPeriod,
+                onPeriodChanged: (salePeriod, startDate, endDate) {
+                  if (salePeriod == SalesPeriod.allTime) {
+                    startDate = null;
+                    endDate = null;
+                  }
+
+                  switch (salePeriod) {
+                    case SalesPeriod.allTime:
+                      startDate = null;
+                      endDate = null;
+                      break;
+                    case SalesPeriod.currentMonth:
+                      startDate = DateTime(
+                        DateTime.now().year,
+                        DateTime.now().month,
+                        1,
+                      );
+                      endDate = DateTime(
+                        DateTime.now().year,
+                        DateTime.now().month + 1,
+                        0,
+                      );
+                      break;
+                    case SalesPeriod.thisYear:
+                      startDate = DateTime(DateTime.now().year, 1, 1);
+                      endDate = DateTime(DateTime.now().year + 1, 1, 0);
+                      break;
+                    case SalesPeriod.lastWeek:
+                      startDate = DateTime.now().subtract(
+                        const Duration(days: 7),
+                      );
+                      endDate = DateTime.now();
+                      break;
+                    case SalesPeriod.lastYear:
+                      startDate = DateTime(DateTime.now().year - 1, 1, 1);
+                      endDate = DateTime(DateTime.now().year, 1, 0);
+                      break;
+                    case SalesPeriod.previousMonth:
+                      startDate = DateTime(
+                        DateTime.now().year,
+                        DateTime.now().month - 1,
+                        1,
+                      );
+                      endDate = DateTime(
+                        DateTime.now().year,
+                        DateTime.now().month,
+                        0,
+                      );
+                      break;
+                    case SalesPeriod.thisWeek:
+                      startDate = DateTime.now().subtract(
+                        Duration(days: DateTime.now().weekday - 1),
+                      );
+                      endDate = DateTime.now().add(
+                        Duration(days: 7 - DateTime.now().weekday),
+                      );
+                      break;
+
+                    default:
+                  }
+
+                  setState(() {
+                    _selectedPeriod = salePeriod;
+                    _startDate = startDate;
+                    _endDate = endDate;
+                  });
+                },
+              ),
+            /*  SizedBox(height: 20.0),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -255,7 +305,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     ],
                   ),
                 ],
-              ),
+              ), */
             const SizedBox(height: 20),
             // Seleccionar formato de archivo
             const Text(
@@ -312,6 +362,54 @@ class _ReportScreenState extends State<ReportScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> showFileOptionsDialog(BuildContext context, String filePath) {
+    final fileName = filePath.split('/').last;
+    return showDialog<void>(
+      context: context,
+      builder:
+          (_) => SimpleDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            title: Row(
+              children: [
+                const Icon(Icons.insert_drive_file, color: Colors.blueAccent),
+                const SizedBox(width: 8),
+                const Text('Opciones de archivo'),
+              ],
+            ),
+            children: [
+              ListTile(
+                leading: const Icon(Icons.open_in_new, color: Colors.green),
+                title: const Text('Abrir archivo'),
+                subtitle: Text(fileName, style: const TextStyle(fontSize: 12)),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  OpenFile.open(filePath);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.share, color: Colors.blue),
+                title: const Text('Compartir archivo'),
+                subtitle: Text(fileName, style: const TextStyle(fontSize: 12)),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Share.shareXFiles([
+                    XFile(filePath),
+                  ], text: 'Te comparto este archivo.');
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.cancel, color: Colors.redAccent),
+                title: const Text('Cancelar'),
+                onTap: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
     );
   }
 }

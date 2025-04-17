@@ -3,7 +3,7 @@ class Expense {
   final String concept;
   final int userId;
   final String amount;
-  final String date;
+  final DateTime date;
 
   Expense({
     required this.id,
@@ -19,7 +19,7 @@ class Expense {
       concept: json['concept'],
       userId: json['user_id'],
       amount: json['amount'],
-      date: json['date'],
+      date: DateTime.parse(json['date']),
     );
   }
 }

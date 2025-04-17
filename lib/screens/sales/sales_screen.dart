@@ -268,7 +268,7 @@ class _SalesScreenState extends State<SalesScreen> {
             ),
             const SizedBox(height: 4),
             Text(
-              "Fecha: ${sale.date}",
+              "Fecha: ${formatDate(sale.date)}",
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],

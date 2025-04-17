@@ -105,7 +105,7 @@ class _SalesStatisticsScreenState extends State<SalesStatisticsScreen> {
           formatCurrency(statsData!["total_profit"].toString()),
         ),
         buildSummaryCard(
-          "Número de Ventas",
+          "Cantidad de Ventas",
           statsData!["sales_count"].toString(),
         ),
         buildSummaryCard(
@@ -250,6 +250,7 @@ class _SalesStatisticsScreenState extends State<SalesStatisticsScreen> {
                   fetchStats();
                 },
               ),
+              SizedBox(height: 20.0),
               isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : RefreshIndicator(

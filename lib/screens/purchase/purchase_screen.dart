@@ -67,14 +67,14 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         title: const Text('Compras', style: TextStyle(color: Colors.white)),
         backgroundColor: Theme.of(context).primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
+        /*  actions: [
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
               // Aquí podrías implementar una búsqueda o filtro para las compras.
             },
           ),
-        ],
+        ], */
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -146,7 +146,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
               Text("Monto: ${formatCurrency(expense.amount)}"),
               const SizedBox(height: 4),
               Text(
-                "Fecha: ${expense.date}",
+                "Fecha: ${formatDate(expense.date)}",
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],

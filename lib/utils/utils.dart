@@ -11,3 +11,7 @@ String formatCurrency(dynamic amount) {
     return "\$0.00";
   }
 }
+
+String formatDate(DateTime date) {
+  return "${date.day}/${date.month}/${date.year}";
+}

@@ -5,12 +5,12 @@ enum SalesPeriod {
   allTime,
   currentMonth,
   previousMonth,
-  last7Days,
-  last30Days,
+  /*   last7Days,
+  last30Days, */
   thisWeek,
   lastWeek,
-  thisQuarter,
-  lastQuarter,
+  /*   thisQuarter,
+  lastQuarter, */
   thisYear,
   lastYear,
   custom,
@@ -41,6 +41,12 @@ class _TimeIntervalSelectorState extends State<TimeIntervalSelector> {
   DateTime? _customStartDate;
   DateTime? _customEndDate;
 
+  @override
+  void initState() {
+    super.initState();
+    _selectedPeriod = widget.period;
+  }
+
   Future<void> _selectDate(BuildContext context, bool isStart) async {
     DateTime initialDate = DateTime.now();
     final DateTime? picked = await showDatePicker(
@@ -67,12 +73,12 @@ class _TimeIntervalSelectorState extends State<TimeIntervalSelector> {
       SalesPeriod.allTime: "Todo el Tiempo",
       SalesPeriod.currentMonth: "Mes Actual",
       SalesPeriod.previousMonth: "Mes Anterior",
-      SalesPeriod.last7Days: "Últimos 7 Días",
-      SalesPeriod.last30Days: "Últimos 30 Días",
+      /* SalesPeriod.last7Days: "Últimos 7 Días",
+      SalesPeriod.last30Days: "Últimos 30 Días", */
       SalesPeriod.thisWeek: "Esta Semana",
       SalesPeriod.lastWeek: "Semana Pasada",
-      SalesPeriod.thisQuarter: "Este Trimestre",
-      SalesPeriod.lastQuarter: "Trimestre Anterior",
+      /*  SalesPeriod.thisQuarter: "Este Trimestre",
+      SalesPeriod.lastQuarter: "Trimestre Anterior", */
       SalesPeriod.thisYear: "Este Año",
       SalesPeriod.lastYear: "Año Anterior",
       SalesPeriod.custom: "Personalizado",

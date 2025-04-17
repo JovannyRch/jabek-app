@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jebek_app/components/drawer.dart';
 import 'package:jebek_app/services/api_service.dart';
-import 'package:jebek_app/services/share_preferences.dart';
-import 'package:jebek_app/utils/const.dart';
 import 'package:jebek_app/utils/utils.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -158,35 +156,46 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: Theme.of(context).textTheme.headlineLarge,
                         ),
                         SizedBox(height: 10),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: lastTransactions.length,
-                          itemBuilder:
-                              (ctx, index) => Card(
-                                child: ListTile(
-                                  leading: Icon(
-                                    lastTransactions[index]['type'] == 'sale'
-                                        ? Icons.point_of_sale
-                                        : Icons.shopping_bag,
-                                    color:
+                        lastTransactions.isEmpty
+                            ? SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.2,
+                              child: Center(
+                                child: Text(
+                                  'No hay movimientos recientes',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ),
+                            )
+                            : ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: lastTransactions.length,
+                              itemBuilder:
+                                  (ctx, index) => Card(
+                                    child: ListTile(
+                                      leading: Icon(
                                         lastTransactions[index]['type'] ==
                                                 'sale'
-                                            ? Colors.green
-                                            : Colors.red[700],
-                                  ),
-                                  title: Text(
-                                    lastTransactions[index]['description'],
-                                  ),
-                                  subtitle: Text(
-                                    lastTransactions[index]['date'],
-                                  ),
-                                  trailing: Text(
-                                    formatCurrency(
-                                      lastTransactions[index]['amount'],
-                                    ),
-                                  ),
-                                  /* onTap: () {
+                                            ? Icons.point_of_sale
+                                            : Icons.shopping_bag,
+                                        color:
+                                            lastTransactions[index]['type'] ==
+                                                    'sale'
+                                                ? Colors.green
+                                                : Colors.red[700],
+                                      ),
+                                      title: Text(
+                                        lastTransactions[index]['description'],
+                                      ),
+                                      subtitle: Text(
+                                        lastTransactions[index]['date'],
+                                      ),
+                                      trailing: Text(
+                                        formatCurrency(
+                                          lastTransactions[index]['amount'],
+                                        ),
+                                      ),
+                                      /* onTap: () {
                                     final isSale =
                                         lastTransactions[index]['type'] ==
                                         'sale';
@@ -195,9 +204,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     
 
                                   } */
-                                ),
-                              ),
-                        ),
+                                    ),
+                                  ),
+                            ),
                       ],
                     ),
           ),

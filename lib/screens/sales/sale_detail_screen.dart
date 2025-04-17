@@ -133,7 +133,7 @@ class SaleDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "Fecha: ${sale.date}",
+                      "Fecha: ${formatDate(sale.date)}",
                       style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   ],
