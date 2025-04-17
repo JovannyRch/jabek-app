@@ -2,115 +2,235 @@ import 'package:flutter/material.dart';
 import 'package:jebek_app/components/app_logo.dart';
 import '../services/api_service.dart';
 
-class RegisterScreen extends StatelessWidget {
-  /*   final TextEditingController nameController = TextEditingController(); */
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController passwordConfirmationController =
-      TextEditingController();
+class RegisterScreen extends StatefulWidget {
+  @override
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
 
-  void _register(BuildContext context) async {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final passwordConfirmationController = TextEditingController();
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
+
+  void _togglePasswordView() {
+    setState(() => _obscurePassword = !_obscurePassword);
+  }
+
+  void _toggleConfirmView() {
+    setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
+  }
+
+  Future<void> _register() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
     try {
-      if (emailController.text.isEmpty ||
-          passwordController.text.isEmpty ||
-          passwordConfirmationController.text.isEmpty) {
-        throw Exception('Todos los campos son requeridos');
-      }
-
-      if (passwordController.text != passwordConfirmationController.text) {
-        throw Exception('Las contraseñas no coinciden');
-      }
-
-      final response = await ApiService.register(
-        emailController.text,
+      final resp = await ApiService.register(
+        emailController.text.trim(),
         passwordController.text,
         passwordConfirmationController.text,
       );
-
-      // Mostrar mensaje de éxito
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Usuario registrado: ${response['user']['name']}'),
-        ),
-      );
-
-      // Navegar a la pantalla de inicio de sesión
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('¡Usuario registrado con éxito!')));
       Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
-      // Mostrar mensaje de error
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).primaryColor;
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(height: 16.0),
-                AppLogo(),
-                Text(
-                  'Registro de usuario',
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                    color: ThemeData().primaryColor,
-                  ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [primary.withOpacity(0.8), primary.withOpacity(0.4)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                SizedBox(height: 8.0),
-                TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                SizedBox(height: 16.0),
-                TextField(
-                  controller: passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Contraseña',
-                    border: OutlineInputBorder(),
-                  ),
-                  obscureText: true,
-                ),
-                SizedBox(height: 16.0),
-                TextField(
-                  controller: passwordConfirmationController,
-                  decoration: InputDecoration(
-                    labelText: 'Confirmar Contraseña',
-                    border: OutlineInputBorder(),
-                  ),
-                  obscureText: true,
-                ),
-                SizedBox(height: 24.0),
-                ElevatedButton(
-                  onPressed: () => _register(context),
-                  child: Text(
-                    'Registrarse',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                elevation: 8,
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Logo
+                        AppLogo(),
+                        const SizedBox(height: 16),
 
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50),
-                    backgroundColor: ThemeData().primaryColor,
+                        // Título
+                        Text(
+                          'Crea tu cuenta',
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color: primary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Regístrate para continuar',
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Email
+                        TextFormField(
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          validator:
+                              (v) =>
+                                  v != null && v.contains('@')
+                                      ? null
+                                      : 'Ingresa un email válido',
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.email),
+                            labelText: 'Correo electrónico',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Contraseña
+                        TextFormField(
+                          controller: passwordController,
+                          obscureText: _obscurePassword,
+                          validator:
+                              (v) =>
+                                  v != null && v.length >= 6
+                                      ? null
+                                      : 'Mínimo 6 caracteres',
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.lock),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: _togglePasswordView,
+                            ),
+                            labelText: 'Contraseña',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Confirmar contraseña
+                        TextFormField(
+                          controller: passwordConfirmationController,
+                          obscureText: _obscureConfirmPassword,
+                          validator:
+                              (v) =>
+                                  v == passwordController.text
+                                      ? null
+                                      : 'Las contraseñas no coinciden',
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureConfirmPassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: _toggleConfirmView,
+                            ),
+                            labelText: 'Confirmar Contraseña',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Botón Registrar
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _register,
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 4,
+                            ),
+                            child:
+                                _isLoading
+                                    ? const CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation(
+                                        Colors.white,
+                                      ),
+                                    )
+                                    : const Text(
+                                      'Registrarse',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Divider con texto
+                        Row(
+                          children: [
+                            Expanded(child: Divider()),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: Text('O'),
+                            ),
+                            Expanded(child: Divider()),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Enlace a login
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('¿Ya tienes cuenta? '),
+                            TextButton(
+                              onPressed:
+                                  () => Navigator.pushReplacementNamed(
+                                    context,
+                                    '/login',
+                                  ),
+                              child: const Text(
+                                'Inicia sesión',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                SizedBox(height: 16.0),
-                TextButton(
-                  onPressed:
-                      () => Navigator.pushReplacementNamed(context, '/login'),
-                  child: Text('¿Ya tienes una cuenta? Inicia sesión'),
-                ),
-              ],
+              ),
             ),
           ),
         ),
