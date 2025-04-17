@@ -3,11 +3,13 @@ class PaginatedResponse<T> {
   final List<T> data;
   final String? nextPageUrl;
   final bool hasMore;
+  final int total;
 
   PaginatedResponse({
     required this.currentPage,
     required this.data,
     required this.nextPageUrl,
+    required this.total,
   }) : hasMore = nextPageUrl != null;
 
   factory PaginatedResponse.fromJson(
@@ -18,6 +20,7 @@ class PaginatedResponse<T> {
       currentPage: json['current_page'],
       data: (json['data'] as List).map((item) => fromJsonT(item)).toList(),
       nextPageUrl: json['next_page_url'],
+      total: int.parse(json['total'].toString()),
     );
   }
 }

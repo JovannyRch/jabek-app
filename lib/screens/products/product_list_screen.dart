@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:jebek_app/components/pro_icon.dart';
 import 'package:jebek_app/models/product.dart';
 import 'package:jebek_app/screens/products/product_detail_screen.dart';
 import 'package:jebek_app/services/api_service.dart';
+import 'package:jebek_app/utils/const.dart';
 import 'package:jebek_app/utils/utils.dart';
 
 class ProductListScreen extends StatefulWidget {
@@ -20,6 +22,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   final String baseUrl = "/products";
   String searchQuery = "";
   Timer? _debounce;
+  int totalProducts = 0;
 
   @override
   void initState() {
@@ -59,6 +62,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         products.addAll(response.data);
         currentPage++;
         hasMore = response.hasMore;
+        totalProducts = response.total;
       });
     } catch (e) {
       print("Error al cargar productos: $e");
@@ -72,6 +76,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Productos", style: TextStyle(color: Colors.white)),
+        actions: [
+          if (!IS_PRO_VERSION)
+            ProIconButton(
+              onPressed: () {
+                showProVersionDialog(context);
+              },
+            ),
+        ],
         backgroundColor: Theme.of(context).primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
         bottom: PreferredSize(
@@ -210,6 +222,24 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return FloatingActionButton(
       heroTag: 'add_product',
       onPressed: () async {
+        if (!IS_PRO_VERSION && totalProducts >= MAX_PRODUCTS) {
+          //show snackbar
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                "¡Actualízate a la versión PRO para agregar más productos!",
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+          //delay 3 seconds
+          await Future.delayed(const Duration(seconds: 1));
+          showProVersionDialog(context);
+          return;
+        }
+
         final response = await Navigator.pushNamed(context, '/create_product');
         if (response == true) {
           _refreshData();
