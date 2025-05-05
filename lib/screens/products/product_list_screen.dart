@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:jebek_app/components/pro_icon.dart';
 import 'package:jebek_app/models/product.dart';
+import 'package:jebek_app/models/settings_model.dart';
 import 'package:jebek_app/screens/products/product_detail_screen.dart';
 import 'package:jebek_app/services/api_service.dart';
-import 'package:jebek_app/utils/const.dart';
 import 'package:jebek_app/utils/utils.dart';
+import 'package:provider/provider.dart';
 
 class ProductListScreen extends StatefulWidget {
   @override
@@ -73,14 +74,15 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<Settings>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Productos", style: TextStyle(color: Colors.white)),
         actions: [
-          if (!IS_PRO_VERSION)
+          if (!settings.isProVersion)
             ProIconButton(
               onPressed: () {
-                showProVersionDialog(context);
+                showProVersionDialog(context, settings);
               },
             ),
         ],

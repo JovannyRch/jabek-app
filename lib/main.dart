@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jebek_app/models/settings_model.dart';
 import 'package:jebek_app/screens/home_screen.dart';
 import 'package:jebek_app/screens/login_screen.dart';
 import 'package:jebek_app/screens/more_screen.dart';
@@ -11,9 +12,16 @@ import 'package:jebek_app/screens/report_screen.dart';
 import 'package:jebek_app/screens/sales/sale_form_screen.dart';
 import 'package:jebek_app/screens/sales/sales_screen.dart';
 import 'package:jebek_app/screens/stats_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() => runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final settings = Settings();
+  await settings.load();
+
+  runApp(ChangeNotifierProvider.value(value: settings, child: const MyApp()));
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

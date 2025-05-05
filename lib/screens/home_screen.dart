@@ -6,11 +6,12 @@ import 'package:jebek_app/components/drawer.dart';
 import 'package:jebek_app/components/pro_icon.dart';
 import 'package:jebek_app/models/expense.dart';
 import 'package:jebek_app/models/sale.dart';
+import 'package:jebek_app/models/settings_model.dart';
 import 'package:jebek_app/screens/purchase/purchase_detail_screen.dart';
 import 'package:jebek_app/screens/sales/sale_detail_screen.dart';
 import 'package:jebek_app/services/api_service.dart';
-import 'package:jebek_app/utils/const.dart';
 import 'package:jebek_app/utils/utils.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -84,13 +85,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<Settings>();
     final appBar = AppBar(
       title: Text('Inicio'),
       actions: [
-        if (!IS_PRO_VERSION)
+        if (!settings.isProVersion)
           ProIconButton(
             onPressed: () {
-              showProVersionDialog(context);
+              showProVersionDialog(context, settings);
             },
           ),
       ],

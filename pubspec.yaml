@@ -1,7 +1,7 @@
 name: jebek_app
 description: "A new Flutter project."
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ^3.7.0
@@ -20,6 +20,8 @@ dependencies:
   shared_preferences: ^2.5.3
   fl_chart: ^0.71.0
   share_plus: ^10.1.4
+  in_app_purchase: ^3.2.1
+  provider: ^6.1.5
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

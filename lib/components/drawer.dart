@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:jebek_app/models/settings_model.dart';
 import 'package:jebek_app/services/share_preferences.dart';
 import 'package:jebek_app/utils/const.dart';
 import 'package:jebek_app/utils/utils.dart';
+import 'package:provider/provider.dart';
 
 class JebekDrawer extends StatefulWidget {
   @override
@@ -34,11 +36,12 @@ class _JebekDrawerState extends State<JebekDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<Settings>();
     return AppDrawer(
       email: _email,
-      isPro: IS_PRO_VERSION,
+      isPro: settings.isProVersion,
       onUpgrade: () async {
-        await showProVersionDialog(context);
+        await showProVersionDialog(context, settings);
       },
       onLogout: () {
         _logout(context);
@@ -105,7 +108,6 @@ class AppDrawer extends StatelessWidget {
                 isPro
                     ? [
                       Container(
-                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: Colors.amber,
                           borderRadius: BorderRadius.circular(6),
