@@ -5,9 +5,13 @@ import 'package:jebek_app/services/api_service.dart';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:jebek_app/services/share_preferences.dart';
+import 'package:jebek_app/utils/utils.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+
+import 'package:jebek_app/models/settings_model.dart';
+import 'package:provider/provider.dart';
 
 enum ReportType { productCatalog, salesList, purchasesList }
 
@@ -27,6 +31,7 @@ class _ReportScreenState extends State<ReportScreen> {
   // Para ventas y compras, el rango de fechas
   DateTime? _startDate;
   DateTime? _endDate;
+  late Settings settings;
 
   SalesPeriod _selectedPeriod = SalesPeriod.currentMonth;
   final DateFormat _dateFormatter = DateFormat('yyyy-MM-dd');
@@ -132,6 +137,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    settings = context.watch<Settings>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Reportes", style: TextStyle(color: Colors.white)),
@@ -346,7 +352,8 @@ class _ReportScreenState extends State<ReportScreen> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: _exportReport,
+                onPressed: settings.isProVersion ? _exportReport : null,
+
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   shape: RoundedRectangleBorder(
@@ -359,6 +366,40 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 20),
+
+            if (!settings.isProVersion)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "¡Adquiere la versión Pro!",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Icon(
+                        Icons.diamond,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      showProVersionDialog(context, settings.buyPro);
+                    },
+                    child: const Text("Ver Beneficios"),
+                  ),
+                ],
+              ),
           ],
         ),
       ),

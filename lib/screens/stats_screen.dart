@@ -6,6 +6,8 @@ import 'package:jebek_app/components/chart_label.dart';
 import 'package:jebek_app/components/time_interval_selector.dart';
 import 'package:jebek_app/services/api_service.dart';
 import 'package:jebek_app/utils/utils.dart';
+import 'package:provider/provider.dart';
+import 'package:jebek_app/models/settings_model.dart';
 
 class SalesStatisticsScreen extends StatefulWidget {
   @override
@@ -19,6 +21,7 @@ class _SalesStatisticsScreenState extends State<SalesStatisticsScreen> {
   SalesPeriod _selectedPeriod = SalesPeriod.currentMonth;
   DateTime? _customStartDate;
   DateTime? _customEndDate;
+  late Settings settings;
   final _cardIcons = {
     "Total Ventas": Icons.shopping_cart,
     "Ganancia Total": Icons.attach_money,
@@ -463,6 +466,7 @@ class _SalesStatisticsScreenState extends State<SalesStatisticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    settings = Provider.of<Settings>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text(

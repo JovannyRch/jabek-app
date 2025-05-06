@@ -41,7 +41,7 @@ class _JebekDrawerState extends State<JebekDrawer> {
       email: _email,
       isPro: settings.isProVersion,
       onUpgrade: () async {
-        await showProVersionDialog(context, settings);
+        await showProVersionDialog(context, settings.buyPro);
       },
       onLogout: () {
         _logout(context);

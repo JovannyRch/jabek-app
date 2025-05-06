@@ -24,6 +24,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   String searchQuery = "";
   Timer? _debounce;
   int totalProducts = 0;
+  late Settings settings;
 
   @override
   void initState() {
@@ -74,7 +75,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<Settings>();
+    settings = context.watch<Settings>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Productos", style: TextStyle(color: Colors.white)),
@@ -82,7 +83,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
           if (!settings.isProVersion)
             ProIconButton(
               onPressed: () {
-                showProVersionDialog(context, settings);
+                showProVersionDialog(context, settings.buyPro);
               },
             ),
         ],
@@ -224,7 +225,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return FloatingActionButton(
       heroTag: 'add_product',
       onPressed: () async {
-        final check = await checkProductsLimit(totalProducts, context);
+        final check = await checkProductsLimit(
+          totalProducts,
+          context,
+          settings.buyPro,
+          settings.isProVersion,
+        );
         if (!check) {
           return;
         }

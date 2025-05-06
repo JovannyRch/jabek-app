@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _purchasesCount = 0;
 
   List<dynamic> lastTransactions = [];
+  late Settings settings;
 
   @override
   void initState() {
@@ -85,14 +86,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<Settings>();
+    settings = context.watch<Settings>();
     final appBar = AppBar(
       title: Text('Inicio'),
       actions: [
         if (!settings.isProVersion)
           ProIconButton(
             onPressed: () {
-              showProVersionDialog(context, settings);
+              showProVersionDialog(context, settings.buyPro);
             },
           ),
       ],
@@ -351,7 +352,12 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisSpacing: 12,
           children: [
             _buildActionButton('Registrar Producto', Icons.add_box, () async {
-              checkProductsLimit(_productsCount, context).then((future) async {
+              checkProductsLimit(
+                _productsCount,
+                context,
+                settings.buyPro,
+                settings.isProVersion,
+              ).then((future) async {
                 if (future == true) {
                   final response = await Navigator.pushNamed(
                     context,
@@ -364,7 +370,12 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             }),
             _buildActionButton('Nueva Venta', Icons.point_of_sale, () async {
-              final check = await checkSalesLimit(_salesCount, context);
+              final check = await checkSalesLimit(
+                _salesCount,
+                context,
+                settings.buyPro,
+                settings.isProVersion,
+              );
 
               if (!check) {
                 return;
@@ -385,6 +396,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 final check = await checkPurchasesLimit(
                   _purchasesCount,
                   context,
+                  settings.buyPro,
+                  settings.isProVersion,
                 );
 
                 if (!check) {

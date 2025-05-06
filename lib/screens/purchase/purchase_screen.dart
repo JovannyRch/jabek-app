@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jebek_app/models/expense.dart';
+import 'package:jebek_app/models/settings_model.dart';
 import 'package:jebek_app/screens/purchase/purchase_detail_screen.dart';
 import 'package:jebek_app/services/api_service.dart';
 import 'package:jebek_app/utils/utils.dart';
+import 'package:provider/provider.dart';
 
 class PurchaseScreen extends StatefulWidget {
   @override
@@ -17,6 +19,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   bool isLoading = false;
   bool hasMore = true;
   int totalExpenses = 0;
+  late Settings settings;
 
   @override
   void initState() {
@@ -64,6 +67,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    settings = context.watch<Settings>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Compras', style: TextStyle(color: Colors.white)),
@@ -103,7 +107,12 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'create-expense',
         onPressed: () async {
-          final check = await checkPurchasesLimit(totalExpenses, context);
+          final check = await checkPurchasesLimit(
+            totalExpenses,
+            context,
+            settings.buyPro,
+            settings.isProVersion,
+          );
 
           if (!check) {
             return;

@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:jebek_app/components/benefit_item.dart';
 import 'package:jebek_app/models/settings_model.dart';
 import 'package:jebek_app/utils/const.dart';
-import 'package:provider/provider.dart';
 
 String formatCurrency(dynamic amount) {
   if (amount is String) {
@@ -30,7 +29,7 @@ String formatDayName(String dayName) {
 }
 
 /// Llama a esta función donde quieras mostrar el diálogo de promoción Pro.
-Future<void> showProVersionDialog(BuildContext context, Settings settings) {
+Future<void> showProVersionDialog(BuildContext context, Function buyPro) {
   return showDialog<void>(
     context: context,
     barrierDismissible: true,
@@ -112,10 +111,10 @@ Future<void> showProVersionDialog(BuildContext context, Settings settings) {
                       icon: Icons.download,
                       text: 'Exporta a Excel y PDF',
                     ),
-                    BenefitItem(
+                    /*  BenefitItem(
                       icon: Icons.support,
                       text: 'Soporte prioritario',
-                    ),
+                    ), */
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -140,18 +139,7 @@ Future<void> showProVersionDialog(BuildContext context, Settings settings) {
                       child: ElevatedButton(
                         onPressed: () async {
                           Navigator.of(dialogContext).pop();
-                          await settings.buyPro();
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                "¡Gracias por adquirir la versión Pro!",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              backgroundColor: Colors.green,
-                              duration: const Duration(seconds: 3),
-                            ),
-                          );
+                          buyPro();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.amber[800],
@@ -174,9 +162,13 @@ Future<void> showProVersionDialog(BuildContext context, Settings settings) {
   );
 }
 
-Future<bool> checkProductsLimit(int count, BuildContext context) async {
-  final settings = context.watch<Settings>();
-  if (!settings.isProVersion && count >= MAX_PRODUCTS) {
+Future<bool> checkProductsLimit(
+  int count,
+  BuildContext context,
+  Function buyPro,
+  bool isProVersion,
+) async {
+  if (!isProVersion && count >= MAX_PRODUCTS) {
     //show snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -190,15 +182,19 @@ Future<bool> checkProductsLimit(int count, BuildContext context) async {
     );
     //delay 3 seconds
     await Future.delayed(const Duration(seconds: 1));
-    showProVersionDialog(context, settings);
+    showProVersionDialog(context, buyPro);
     return false;
   }
   return true;
 }
 
-Future<bool> checkSalesLimit(int count, BuildContext context) async {
-  final settings = context.watch<Settings>();
-  if (!settings.isProVersion && count >= MAX_SALES) {
+Future<bool> checkSalesLimit(
+  int count,
+  BuildContext context,
+  Function buyPro,
+  bool isProVersion,
+) async {
+  if (!isProVersion && count >= MAX_SALES) {
     //show snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -212,15 +208,19 @@ Future<bool> checkSalesLimit(int count, BuildContext context) async {
     );
     //delay 3 seconds
     await Future.delayed(const Duration(seconds: 1));
-    showProVersionDialog(context, settings);
+    showProVersionDialog(context, buyPro);
     return false;
   }
   return true;
 }
 
-Future<bool> checkPurchasesLimit(int count, BuildContext context) async {
-  final settings = context.watch<Settings>();
-  if (!settings.isProVersion && count >= MAX_PURCHASES) {
+Future<bool> checkPurchasesLimit(
+  int count,
+  BuildContext context,
+  Function buyPro,
+  bool isProVersion,
+) async {
+  if (!isProVersion && count >= MAX_PURCHASES) {
     //show snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -234,7 +234,7 @@ Future<bool> checkPurchasesLimit(int count, BuildContext context) async {
     );
     //delay 3 seconds
     await Future.delayed(const Duration(seconds: 1));
-    showProVersionDialog(context, settings);
+    showProVersionDialog(context, buyPro);
     return false;
   }
 

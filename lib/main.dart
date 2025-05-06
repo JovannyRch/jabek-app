@@ -30,7 +30,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Jebek App',
-
       debugShowCheckedModeBanner: false,
       home: FutureBuilder(
         future: SharedPreferences.getInstance(),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jebek_app/models/settings_model.dart';
+import 'package:provider/provider.dart';
 
 enum SalesPeriod {
   allTime,
@@ -15,6 +17,15 @@ enum SalesPeriod {
   lastYear,
   custom,
 }
+
+//pro sales periods
+final List<SalesPeriod> proSalesPeriods = [
+  SalesPeriod.allTime,
+  SalesPeriod.previousMonth,
+  SalesPeriod.lastWeek,
+  SalesPeriod.lastYear,
+  SalesPeriod.custom,
+];
 
 class TimeIntervalSelector extends StatefulWidget {
   final SalesPeriod period;
@@ -40,6 +51,7 @@ class _TimeIntervalSelectorState extends State<TimeIntervalSelector> {
   late SalesPeriod _selectedPeriod = widget.period;
   DateTime? _customStartDate;
   DateTime? _customEndDate;
+  late Settings settings;
 
   @override
   void initState() {
@@ -69,6 +81,7 @@ class _TimeIntervalSelectorState extends State<TimeIntervalSelector> {
 
   @override
   Widget build(BuildContext context) {
+    settings = context.watch<Settings>();
     final periodNames = {
       SalesPeriod.allTime: "Todo el Tiempo",
       SalesPeriod.currentMonth: "Mes Actual",
@@ -89,12 +102,34 @@ class _TimeIntervalSelectorState extends State<TimeIntervalSelector> {
       children: [
         DropdownButton<SalesPeriod>(
           value: _selectedPeriod,
+
           isExpanded: true,
           items:
               SalesPeriod.values.map((period) {
                 return DropdownMenuItem<SalesPeriod>(
+                  enabled:
+                      settings.isProVersion ||
+                      !proSalesPeriods.contains(period),
                   value: period,
-                  child: Text(periodNames[period]!),
+                  child:
+                      (settings.isProVersion ||
+                              !proSalesPeriods.contains(period))
+                          ? Text(periodNames[period] ?? "")
+                          : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                periodNames[period] ?? "",
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+
+                              const Icon(
+                                Icons.diamond,
+                                color: Colors.red,
+                                size: 16,
+                              ),
+                            ],
+                          ),
                 );
               }).toList(),
           onChanged: (newVal) {

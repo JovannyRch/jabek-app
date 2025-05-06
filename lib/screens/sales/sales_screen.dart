@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jebek_app/models/product.dart';
 import 'package:jebek_app/models/sale.dart';
+import 'package:jebek_app/models/settings_model.dart';
 import 'package:jebek_app/screens/sales/sale_detail_screen.dart';
 import 'package:jebek_app/services/api_service.dart';
 import 'package:jebek_app/utils/utils.dart';
+import 'package:provider/provider.dart';
 
 class SalesScreen extends StatefulWidget {
   Product? product;
@@ -23,6 +25,7 @@ class _SalesScreenState extends State<SalesScreen> {
   bool hasMore = true;
   String searchQuery = '';
   int totalSales = 0;
+  late Settings settings;
 
   @override
   void initState() {
@@ -68,6 +71,7 @@ class _SalesScreenState extends State<SalesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<Settings>();
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -158,7 +162,12 @@ class _SalesScreenState extends State<SalesScreen> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'add-sale',
         onPressed: () async {
-          final check = await checkSalesLimit(totalSales, context);
+          final check = await checkSalesLimit(
+            totalSales,
+            context,
+            settings.buyPro,
+            settings.isProVersion,
+          );
           if (!check) {
             return;
           }

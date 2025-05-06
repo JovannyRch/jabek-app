@@ -1,5 +1,5 @@
 final String APP_NAME = 'Jebek App';
 
-final MAX_PRODUCTS = 3;
-final MAX_SALES = 3;
-final MAX_PURCHASES = 3;
+final MAX_PRODUCTS = 51;
+final MAX_SALES = 51;
+final MAX_PURCHASES = 51;
